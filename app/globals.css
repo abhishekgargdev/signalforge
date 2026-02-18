@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+:root {
+  --background: #080c08;
+  --foreground: #ecfdf5;
+  --primary: #22c55e;
+  --primary-foreground: #022c22;
+  --secondary: #f59e0b;
+  --secondary-foreground: #451a03;
+  --card: #0e1710;
+  --card-foreground: #d1fae5;
+  --border: rgba(34, 197, 94, 0.22);
+  --muted: #064e3b;
+  --muted-foreground: #6ee7b7;
+  --accent: #10b981;
+  --accent-foreground: #022c22;
+  --radius: 0.5rem;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  letter-spacing: -0.01em;
+}
+
+/* Custom terminal scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080c08;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(34, 197, 94, 0.25);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 197, 94, 0.45);
+}
