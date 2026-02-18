@@ -1,0 +1,6 @@
+{
+  "name": "SignalForge",
+  "description": "AI-powered personal-brand, technology-intelligence, content-generation, company-engagement, and career-signal platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
