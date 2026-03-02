@@ -11,18 +11,20 @@ export async function POST(req: NextRequest) {
       return standardError('VALIDATION_ERROR', 'Prompt is required', 400);
     }
 
-    const text = await AIService.generateTechnicalContent({
+    const result = await AIService.generateTechnicalContent({
       prompt: body.prompt,
       type: body.type,
       context: body.context,
     });
 
     return standardResponse({
-      text,
-      model: 'gemini-2.5-flash',
+      text: result.text,
+      provider: result.provider,
+      model: result.model,
       userId: user.id,
     });
-  } catch (err: any) {
-    return standardError('AI_GENERATION_ERROR', err.message || 'Generation failed', 500);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Generation failed';
+    return standardError('AI_GENERATION_ERROR', message, 502);
   }
 }
