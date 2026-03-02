@@ -5,9 +5,24 @@ import { Mail, MessageSquare, Terminal, CheckCircle2 } from 'lucide-react';
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    const res = await fetch('/api/v1/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, message }),
+    });
+    const data = await res.json();
+    if (!data.success) {
+      setError(data.error?.message || 'Could not send message');
+      return;
+    }
     setSent(true);
   };
 
@@ -39,6 +54,8 @@ export default function ContactPage() {
               <input
                 type="text"
                 required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
                 className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-slate-200 placeholder-zinc-600 focus:outline-none"
               />
@@ -49,6 +66,8 @@ export default function ContactPage() {
               <input
                 type="email"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@work-email.com"
                 autoComplete="email"
                 className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-slate-200 placeholder-zinc-600 focus:outline-none"
@@ -60,16 +79,19 @@ export default function ContactPage() {
               <textarea
                 rows={4}
                 required
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
                 placeholder="How can we help?"
                 className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-slate-200 placeholder-zinc-600 focus:outline-none resize-none"
               />
             </div>
 
+            {error && <p className="text-xs text-red-300">{error}</p>}
             <button
               type="submit"
               className="w-full py-2.5 rounded-lg bg-[#22c55e] text-black font-bold text-xs hover:bg-emerald-400 transition"
             >
-              Transmit Dispatch
+              Send message
             </button>
           </form>
         )}

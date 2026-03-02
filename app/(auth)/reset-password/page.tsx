@@ -2,18 +2,34 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Lock, CheckCircle2 } from 'lucide-react';
 
 export default function ResetPasswordPage() {
+  const searchParams = useSearchParams();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === confirmPassword) {
-      setSuccess(true);
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
     }
+    setError(null);
+    const res = await fetch('/api/v1/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: searchParams.get('token'), password }),
+    });
+    const data = await res.json();
+    if (!data.success) {
+      setError(data.error?.message || 'Could not reset password');
+      return;
+    }
+    setSuccess(true);
   };
 
   return (
@@ -59,11 +75,12 @@ export default function ResetPasswordPage() {
             />
           </div>
 
+          {error && <p className="text-xs text-red-300">{error}</p>}
           <button
             type="submit"
             className="w-full py-2.5 rounded-lg bg-[#22c55e] text-black font-extrabold text-xs hover:bg-emerald-400 transition"
           >
-            Update Credentials
+            Update password
           </button>
         </form>
       )}

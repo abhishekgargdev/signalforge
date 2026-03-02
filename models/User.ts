@@ -9,6 +9,9 @@ export interface IUser extends Document {
   role: 'USER' | 'ADMIN';
   status: 'ACTIVE' | 'SUSPENDED' | 'PENDING';
   emailVerified: boolean;
+  emailVerifyToken?: string;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
   avatarMediaId?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -23,6 +26,9 @@ const UserSchema = new Schema<IUser>(
     role: { type: String, enum: ['USER', 'ADMIN'], default: 'USER' },
     status: { type: String, enum: ['ACTIVE', 'SUSPENDED', 'PENDING'], default: 'ACTIVE' },
     emailVerified: { type: Boolean, default: false },
+    emailVerifyToken: { type: String },
+    passwordResetToken: { type: String },
+    passwordResetExpires: { type: Date },
     avatarMediaId: { type: String },
   },
   { timestamps: true }

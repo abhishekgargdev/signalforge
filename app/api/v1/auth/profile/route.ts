@@ -1,10 +1,14 @@
 import { cookies } from 'next/headers';
+import mongoose from 'mongoose';
 import {
   createSessionCookie,
   getSessionUser,
   standardError,
   standardResponse,
 } from '@/lib/auth';
+import { connectToDatabase, isDbConnected } from '@/lib/db/mongoose';
+import { Profile } from '@/models/Profile';
+import { User } from '@/models/User';
 
 export async function PATCH(req: Request) {
   const current = await getSessionUser();
@@ -22,6 +26,15 @@ export async function PATCH(req: Request) {
   }
 
   const next = { ...current, name, headline, bio };
+  await connectToDatabase();
+  if (isDbConnected() && mongoose.Types.ObjectId.isValid(current.id)) {
+    await User.updateOne({ _id: current.id }, { name });
+    await Profile.findOneAndUpdate(
+      { userId: current.id },
+      { userId: current.id, headline, bio },
+      { upsert: true }
+    );
+  }
   const cookieStore = await cookies();
   cookieStore.set('sf_session', createSessionCookie(next), {
     httpOnly: true,

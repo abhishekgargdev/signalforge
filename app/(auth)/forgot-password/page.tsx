@@ -7,9 +7,21 @@ import { Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    const res = await fetch('/api/v1/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!data.success) {
+      setError(data.error?.message || 'Could not send reset email');
+      return;
+    }
     setSent(true);
   };
 
@@ -43,11 +55,12 @@ export default function ForgotPasswordPage() {
             />
           </div>
 
+          {error && <p className="text-xs text-red-300">{error}</p>}
           <button
             type="submit"
             className="w-full py-2.5 rounded-lg bg-[#22c55e] text-black font-extrabold text-xs hover:bg-emerald-400 transition"
           >
-            Send Recovery Dispatch
+            Send reset email
           </button>
         </form>
       )}
