@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
-import { ProspectorView } from '@/components/modules/ProspectorView';
+import { ConnectionsView } from '@/components/modules/ConnectionsView';
 
-export default function ProspectorPage() {
-  return <ProspectorView />;
+export default function ConnectionsPage() {
+  return <ConnectionsView />;
 }

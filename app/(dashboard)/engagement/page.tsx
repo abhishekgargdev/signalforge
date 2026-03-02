@@ -1,14 +1,7 @@
 'use client';
 
-import React from 'react';
-import { EngagementView } from '@/components/modules/EngagementView';
-import { INITIAL_ENGAGEMENTS, INITIAL_PEOPLE } from '@/lib/signalforge-data';
+import { CommentsView } from '@/components/modules/CommentsView';
 
-export default function EngagementPage() {
-  return (
-    <EngagementView
-      opportunities={INITIAL_ENGAGEMENTS}
-      people={INITIAL_PEOPLE}
-    />
-  );
+export default function CommentsPage() {
+  return <CommentsView />;
 }
