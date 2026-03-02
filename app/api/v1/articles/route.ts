@@ -11,6 +11,18 @@ export async function GET() {
   }
 }
 
+export async function PUT(req: NextRequest) {
+  try {
+    const user = await requireAuth();
+    const body = await req.json();
+    if (!body.id) return standardError('ARTICLE_UPDATE_ERROR', 'Article id is required', 400);
+    const updated = await ArticleService.update(body.id, body, user.id);
+    return standardResponse({ article: updated });
+  } catch (err: any) {
+    return standardError('ARTICLE_UPDATE_ERROR', err.message || 'Failed to update article', 500);
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const user = await requireAuth();

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Kanban,
   Sparkles,
@@ -30,6 +30,7 @@ interface ContentViewProps {
   signals: TopicSignal[];
   experiences: ExperienceItem[];
   onAddNewContentItem: (item: ContentItem) => void;
+  initialTab?: 'kanban' | 'wizard' | 'carousel' | 'calendar';
 }
 
 export function ContentView({
@@ -37,9 +38,21 @@ export function ContentView({
   signals,
   experiences,
   onAddNewContentItem,
+  initialTab = 'kanban',
 }: ContentViewProps) {
   const [pipeline, setPipeline] = useState<ContentItem[]>(initialPipeline);
-  const [activeTab, setActiveTab] = useState<'kanban' | 'wizard' | 'carousel' | 'calendar'>('kanban');
+
+  useEffect(() => {
+    fetch('/api/v1/content')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data?.content)) {
+          setPipeline(data.data.content);
+        }
+      })
+      .catch(() => {});
+  }, []);
+  const [activeTab, setActiveTab] = useState<'kanban' | 'wizard' | 'carousel' | 'calendar'>(initialTab);
 
   // Modals for CRUD
   const [viewingItem, setViewingItem] = useState<ContentItem | null>(null);
@@ -102,8 +115,8 @@ export function ContentView({
     }
   };
 
-  const handlePublishFromWizard = () => {
-    const newItem: ContentItem = {
+  const handlePublishFromWizard = async () => {
+    const draft: ContentItem = {
       id: `cnt-${Date.now()}`,
       title: wizardData.contentAngle,
       type: wizardData.platform === 'LinkedIn' ? 'LinkedIn Post' : 'Technical Article',
@@ -114,6 +127,13 @@ export function ContentView({
       tags: wizardData.hashtags.map((h) => h.replace('#', '')),
       body: `${wizardData.hookText}\n\n${wizardData.bodyText}\n\n${wizardData.ctaText}`,
     };
+    const res = await fetch('/api/v1/content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(draft),
+    });
+    const data = await res.json();
+    const newItem = data.success ? (data.data.item as ContentItem) : draft;
     onAddNewContentItem(newItem);
     setPipeline([newItem, ...pipeline]);
     setActiveTab('kanban');

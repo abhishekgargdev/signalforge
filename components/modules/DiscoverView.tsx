@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Radar,
   TrendingUp,
@@ -35,6 +35,17 @@ interface DiscoverViewProps {
 
 export function DiscoverView({ signals: initialSignals, onSelectTopic, onDraftContent }: DiscoverViewProps) {
   const [signals, setSignals] = useState<TopicSignal[]>(initialSignals);
+
+  useEffect(() => {
+    fetch('/api/v1/topics')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data?.topics)) {
+          setSignals(data.data.topics);
+        }
+      })
+      .catch(() => {});
+  }, []);
   const [activeTab, setActiveTab] = useState<'All' | 'Trending' | 'AI & Inference' | 'Distributed Systems' | 'Database Engines' | 'Saved'>('All');
   const [selectedTopicDetail, setSelectedTopicDetail] = useState<TopicSignal | null>(null);
   const [savedTopics, setSavedTopics] = useState<string[]>([]);
@@ -105,22 +116,14 @@ export function DiscoverView({ signals: initialSignals, onSelectTopic, onDraftCo
     if (!newSignal.title) return;
     setIsSaving(true);
     try {
-      await new Promise((r) => setTimeout(r, 400));
-      const created: TopicSignal = {
-        id: `sig-${Date.now()}`,
-        title: newSignal.title,
-        category: newSignal.category as any,
-        summary: newSignal.summary || 'Summary pending analysis.',
-        source: newSignal.source || 'Tech Radar',
-        trendScore: newSignal.trendScore || 90,
-        freshness: 'Just added',
-        careerRelevance: newSignal.careerRelevance || 'Staff Systems Engineer',
-        companyRelevance: newSignal.companyRelevance || [],
-        tags: newSignal.tags || ['Systems'],
-        keyFacts: newSignal.keyFacts || ['Production deployment verified.'],
-        timeline: newSignal.timeline || [{ year: '2026', milestone: 'Signal identified' }],
-        suggestedAngles: newSignal.suggestedAngles || ['Key engineering trade-offs'],
-      };
+      const res = await fetch('/api/v1/topics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newSignal),
+      });
+      const data = await res.json();
+      if (!data.success) return;
+      const created = data.data.topic as TopicSignal;
       setSignals([created, ...signals]);
       setAddSignalModalOpen(false);
       setNewSignal({

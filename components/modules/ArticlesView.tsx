@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FileText,
   Plus,
@@ -31,6 +31,17 @@ interface ArticlesViewProps {
 
 export function ArticlesView({ articles: initialArticles, onOpenPublicArticle }: ArticlesViewProps) {
   const [articles, setArticles] = useState<ArticleItem[]>(initialArticles);
+
+  useEffect(() => {
+    fetch('/api/v1/articles')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data?.articles) && data.data.articles.length > 0) {
+          setArticles(data.data.articles);
+        }
+      })
+      .catch(() => {});
+  }, []);
   const [activeTab, setActiveTab] = useState<'list' | 'editor'>('list');
   const [selectedArticle, setSelectedArticle] = useState<ArticleItem>(initialArticles[0] || {} as ArticleItem);
 
@@ -74,7 +85,6 @@ export function ArticlesView({ articles: initialArticles, onOpenPublicArticle }:
     setIsSaving(true);
     setSaveSuccess(null);
     try {
-      await new Promise((r) => setTimeout(r, 400));
       const updated: ArticleItem = {
         ...selectedArticle,
         title: editedTitle,
@@ -87,8 +97,15 @@ export function ArticlesView({ articles: initialArticles, onOpenPublicArticle }:
           metaDescription: seoDesc,
         },
       };
+      const res = await fetch('/api/v1/articles', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+      const data = await res.json();
+      const saved = data.success ? (data.data.article as ArticleItem) : updated;
       setArticles((prev) =>
-        prev.map((a) => (a.id === selectedArticle.id ? updated : a))
+        prev.map((a) => (a.id === selectedArticle.id ? saved : a))
       );
       setSelectedArticle(updated);
       setSaveSuccess('Article and SEO metadata published successfully!');
@@ -114,10 +131,10 @@ export function ArticlesView({ articles: initialArticles, onOpenPublicArticle }:
     }
   };
 
-  const handleCreateNewArticle = () => {
+  const handleCreateNewArticle = async () => {
     if (!newTitle) return;
     const slug = newTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-    const created: ArticleItem = {
+    const draft: ArticleItem = {
       id: `art-${Date.now()}`,
       slug,
       title: newTitle,
@@ -141,6 +158,13 @@ export function ArticlesView({ articles: initialArticles, onOpenPublicArticle }:
         ogImage: '',
       },
     };
+    const res = await fetch('/api/v1/articles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(draft),
+    });
+    const data = await res.json();
+    const created = data.success ? (data.data.article as ArticleItem) : draft;
     setArticles([created, ...articles]);
     setAddArticleModalOpen(false);
     setNewTitle('');

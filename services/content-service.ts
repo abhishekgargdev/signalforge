@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { connectToDatabase, isDbConnected } from '@/lib/db/mongoose';
 import { Content } from '@/models/Content';
 import { INITIAL_CONTENT_PIPELINE, ContentItem } from '@/lib/signalforge-data';
@@ -46,6 +47,34 @@ export class ContentService {
       engagements: 0,
     };
     inMemoryContent.unshift(newItem);
+    await connectToDatabase();
+    if (isDbConnected() && mongoose.Types.ObjectId.isValid(userId)) {
+      const statusMap: Record<string, string> = {
+        idea: 'IDEA',
+        draft: 'DRAFT',
+        review: 'REVIEW',
+        approved: 'APPROVED',
+        scheduled: 'SCHEDULED',
+        published: 'PUBLISHED',
+      };
+      const typeMap: Record<string, string> = {
+        'LinkedIn Post': 'LINKEDIN_POST',
+        'Technical Article': 'ARTICLE',
+        'Carousel Slides': 'CAROUSEL',
+        'X Thread': 'SHORT_POST',
+      };
+      const saved = await Content.create({
+        userId,
+        title: newItem.title,
+        type: typeMap[newItem.type] || 'LINKEDIN_POST',
+        status: statusMap[newItem.status] || 'DRAFT',
+        platform: newItem.platform === 'X' || newItem.platform === 'Web' || newItem.platform === 'All' ? newItem.platform : 'LinkedIn',
+        body: newItem.body || newItem.title,
+        tags: newItem.tags,
+        scheduledDate: newItem.scheduledDate,
+      });
+      newItem.id = saved._id.toString();
+    }
     return newItem;
   }
 }

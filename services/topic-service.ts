@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { connectToDatabase, isDbConnected } from '@/lib/db/mongoose';
 import { Topic, ITopic } from '@/models/Topic';
 import { INITIAL_TOPIC_SIGNALS, TopicSignal } from '@/lib/signalforge-data';
@@ -60,6 +61,27 @@ export class TopicService {
     };
 
     inMemoryTopics.unshift(newTopic);
+    await connectToDatabase();
+    if (isDbConnected() && mongoose.Types.ObjectId.isValid(userId)) {
+      const saved = await Topic.create({
+        userId,
+        title: newTopic.title,
+        slug: `topic-${Date.now()}`,
+        category: newTopic.category,
+        summary: newTopic.summary,
+        source: newTopic.source,
+        trendScore: newTopic.trendScore,
+        freshness: newTopic.freshness,
+        careerRelevance: newTopic.careerRelevance,
+        companyRelevance: newTopic.companyRelevance,
+        tags: newTopic.tags,
+        keyFacts: newTopic.keyFacts,
+        timeline: newTopic.timeline,
+        suggestedAngles: newTopic.suggestedAngles,
+        isSaved: false,
+      });
+      newTopic.id = saved._id.toString();
+    }
     return newTopic;
   }
 }

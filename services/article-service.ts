@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { connectToDatabase, isDbConnected } from '@/lib/db/mongoose';
 import { Article } from '@/models/Article';
 import { INITIAL_ARTICLES, ArticleItem } from '@/lib/signalforge-data';
@@ -62,6 +63,68 @@ export class ArticleService {
       },
     };
     inMemoryArticles.unshift(newArt);
+    await connectToDatabase();
+    if (isDbConnected() && mongoose.Types.ObjectId.isValid(userId)) {
+      const status = (newArt.status || 'draft').toUpperCase();
+      const saved = await Article.create({
+        userId,
+        title: newArt.title,
+        slug: newArt.slug,
+        subtitle: newArt.subtitle,
+        category: newArt.category,
+        status: ['DRAFT', 'PUBLISHED', 'SCHEDULED', 'ARCHIVED'].includes(status) ? status : 'DRAFT',
+        publishedDate: newArt.publishedDate,
+        readTime: newArt.readTime,
+        views: 0,
+        coverImage: newArt.coverImage,
+        contentMarkdown: newArt.contentMarkdown,
+        toc: newArt.toc,
+        seo: newArt.seo,
+      });
+      newArt.id = saved._id.toString();
+    }
     return newArt;
+  }
+
+  static async update(id: string, data: Partial<ArticleItem>, userId: string): Promise<ArticleItem | null> {
+    await connectToDatabase();
+    const current = inMemoryArticles.find((a) => a.id === id);
+    const merged: ArticleItem = {
+      ...(current || {
+        id,
+        slug: data.slug || id,
+        title: data.title || 'Untitled Article',
+        subtitle: '',
+        category: 'Architecture',
+        status: 'draft',
+        publishedDate: '',
+        readTime: '5 min read',
+        views: 0,
+        coverImage: '',
+        contentMarkdown: '',
+        toc: [],
+        seo: { metaTitle: '', metaDescription: '', canonicalUrl: '', keywords: [], ogImage: '' },
+      }),
+      ...data,
+      id,
+    };
+    inMemoryArticles = inMemoryArticles.map((a) => (a.id === id ? merged : a));
+    if (isDbConnected() && mongoose.Types.ObjectId.isValid(id) && mongoose.Types.ObjectId.isValid(userId)) {
+      const status = (merged.status || 'draft').toUpperCase();
+      await Article.findOneAndUpdate(
+        { _id: id, userId },
+        {
+          title: merged.title,
+          slug: merged.slug,
+          subtitle: merged.subtitle,
+          category: merged.category,
+          status: ['DRAFT', 'PUBLISHED', 'SCHEDULED', 'ARCHIVED'].includes(status) ? status : 'DRAFT',
+          contentMarkdown: merged.contentMarkdown,
+          seo: merged.seo,
+          coverImage: merged.coverImage,
+        }
+      );
+    }
+    return merged;
   }
 }

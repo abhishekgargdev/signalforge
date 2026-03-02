@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BrainCircuit,
   Plus,
@@ -35,6 +35,21 @@ export function KnowledgeView({
 }: KnowledgeViewProps) {
   const [experiences, setExperiences] = useState<ExperienceItem[]>(initialExperiences);
   const [projects, setProjects] = useState<ProjectItem[]>(initialProjects);
+
+  useEffect(() => {
+    fetch('/api/v1/knowledge/experiences')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data?.experiences)) setExperiences(data.data.experiences);
+      })
+      .catch(() => {});
+    fetch('/api/v1/knowledge/projects')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data?.projects)) setProjects(data.data.projects);
+      })
+      .catch(() => {});
+  }, []);
   const [activeTab, setActiveTab] = useState<'experiences' | 'projects'>('experiences');
 
   // Modals for CRUD
@@ -114,8 +129,7 @@ export function KnowledgeView({
     if (!newExp.title) return;
     setIsSaving(true);
     try {
-      await new Promise((r) => setTimeout(r, 400));
-      const created: ExperienceItem = {
+      const draft: ExperienceItem = {
         id: `exp-${Date.now()}`,
         title: newExp.title,
         project: newExp.project || 'Core Systems',
@@ -127,6 +141,13 @@ export function KnowledgeView({
         lesson: newExp.lesson || 'In-kernel ring buffers bypass context-switch latency',
         tags: newExp.tags || ['Systems'],
       };
+      const res = await fetch('/api/v1/knowledge/experiences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(draft),
+      });
+      const data = await res.json();
+      const created = data.success ? (data.data.experience as ExperienceItem) : draft;
       setExperiences([created, ...experiences]);
       setAddExpModalOpen(false);
       setNewExp({
@@ -165,8 +186,7 @@ export function KnowledgeView({
     if (!newProj.name) return;
     setIsSaving(true);
     try {
-      await new Promise((r) => setTimeout(r, 400));
-      const created: ProjectItem = {
+      const draft: ProjectItem = {
         id: `proj-${Date.now()}`,
         name: newProj.name,
         description: newProj.description || 'Open source systems architecture',
@@ -177,6 +197,13 @@ export function KnowledgeView({
         liveUrl: newProj.liveUrl || '',
         lessons: newProj.lessons || 'Zero-copy memory management in critical paths',
       };
+      const res = await fetch('/api/v1/knowledge/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(draft),
+      });
+      const data = await res.json();
+      const created = data.success ? (data.data.project as ProjectItem) : draft;
       setProjects([created, ...projects]);
       setAddProjModalOpen(false);
       setNewProj({

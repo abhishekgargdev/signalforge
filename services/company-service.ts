@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { connectToDatabase, isDbConnected } from '@/lib/db/mongoose';
 import { Company } from '@/models/Company';
 import { INITIAL_COMPANIES, TargetCompany } from '@/lib/signalforge-data';
@@ -34,6 +35,11 @@ export class CompanyService {
     return inMemoryCompanies;
   }
 
+  static async getById(id: string): Promise<TargetCompany | null> {
+    const all = await this.getAll('session');
+    return all.find((c) => c.id === id) || null;
+  }
+
   static async create(data: Partial<TargetCompany>, userId: string): Promise<TargetCompany> {
     const newComp: TargetCompany = {
       id: `comp-${Date.now()}`,
@@ -51,6 +57,23 @@ export class CompanyService {
       signals: [{ title: 'Company profile created', date: 'Just now', relevance: 'High' }],
     };
     inMemoryCompanies.unshift(newComp);
+
+    await connectToDatabase();
+    if (isDbConnected() && mongoose.Types.ObjectId.isValid(userId)) {
+      const saved = await Company.create({
+        userId,
+        name: newComp.name,
+        slug: newComp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `company-${Date.now()}`,
+        industry: newComp.industry,
+        priority: newComp.priority,
+        technologies: newComp.technologies,
+        headquarters: newComp.headquarters,
+        description: newComp.description,
+        openRolesCount: newComp.openRolesCount,
+        logo: newComp.logo,
+      });
+      newComp.id = saved._id.toString();
+    }
     return newComp;
   }
 }

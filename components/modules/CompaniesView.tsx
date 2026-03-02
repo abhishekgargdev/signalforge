@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Building2,
   Users,
@@ -29,16 +29,29 @@ interface CompaniesViewProps {
   companies: TargetCompany[];
   people: TargetPerson[];
   onNavigateToEngagement: () => void;
+  initialTab?: 'companies' | 'people';
 }
 
 export function CompaniesView({
   companies: initialCompanies,
   people: initialPeople,
-  onNavigateToEngagement
+  onNavigateToEngagement,
+  initialTab = 'companies',
 }: CompaniesViewProps) {
   const [companies, setCompanies] = useState<TargetCompany[]>(initialCompanies);
+
+  useEffect(() => {
+    fetch('/api/v1/companies')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data?.companies)) {
+          setCompanies(data.data.companies);
+        }
+      })
+      .catch(() => {});
+  }, []);
   const [people, setPeople] = useState<TargetPerson[]>(initialPeople);
-  const [activeTab, setActiveTab] = useState<'companies' | 'people'>('companies');
+  const [activeTab, setActiveTab] = useState<'companies' | 'people'>(initialTab);
   const [tierFilter, setTierFilter] = useState<'All' | 'Tier 1' | 'Tier 2'>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCompany, setSelectedCompany] = useState<TargetCompany | null>(initialCompanies[0] || null);
@@ -162,28 +175,23 @@ export function CompaniesView({
     if (!newCompany.name) return;
     setIsSaving(true);
     try {
-      await new Promise((r) => setTimeout(r, 400));
-      const created: TargetCompany = {
-        id: `comp-${Date.now()}`,
-        name: newCompany.name,
-        logo: '',
-        industry: newCompany.industry || 'Tech',
-        priority: newCompany.priority || 'Tier 1',
-        technologies: newCompany.technologies || ['Distributed Systems'],
-        recentSignalCount: newCompany.recentSignalCount || 1,
-        engagementCount: 0,
-        headquarters: newCompany.headquarters || 'Remote',
-        targetRoles: newCompany.targetRoles || ['Staff Software Engineer'],
-        description: newCompany.description || `${newCompany.name} engineering organization.`,
-        openRolesCount: newCompany.openRolesCount || 4,
-        signals: [
-          {
-            title: `Infrastructure architecture initiative at ${newCompany.name}`,
-            date: 'Today',
-            relevance: 'High',
-          },
-        ],
-      };
+      const res = await fetch('/api/v1/companies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newCompany.name,
+          industry: newCompany.industry || 'Tech',
+          priority: newCompany.priority || 'Tier 1',
+          technologies: newCompany.technologies || [],
+          headquarters: newCompany.headquarters || 'Remote',
+          targetRoles: newCompany.targetRoles || [],
+          description: newCompany.description || '',
+          openRolesCount: newCompany.openRolesCount || 0,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) return;
+      const created = data.data.company as TargetCompany;
       setCompanies([created, ...companies]);
       setSelectedCompany(created);
       setAddCompanyModalOpen(false);
