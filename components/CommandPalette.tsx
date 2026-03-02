@@ -28,12 +28,15 @@ export function CommandPalette({ isOpen, onClose, onNavigate }: CommandPalettePr
 
   const q = query.trim().toLowerCase();
   const navTargets = [
-    { mod: 'discover', label: 'Discover Radar', keywords: ['discover', 'signal', 'radar', 'topic'] },
-    { mod: 'content', label: 'Content Pipeline', keywords: ['content', 'kanban', 'draft', 'wizard'] },
-    { mod: 'companies', label: 'Companies & People', keywords: ['company', 'people', 'crm'] },
+    { mod: 'dashboard', label: 'Dashboard', keywords: ['dashboard', 'home', 'charts'] },
+    { mod: 'content', label: 'Content Pipeline', keywords: ['content', 'post', 'draft'] },
+    { mod: 'topics', label: 'Topics', keywords: ['topic', 'subject'] },
+    { mod: 'companies', label: 'Target Companies', keywords: ['company', 'target'] },
+    { mod: 'occasions', label: 'Occasions', keywords: ['holiday', 'celebration', 'occasion'] },
     { mod: 'articles', label: 'Technical Articles', keywords: ['article', 'publish', 'essay'] },
-    { mod: 'prospector', label: 'LinkedIn Prospector', keywords: ['linkedin', 'prospect', 'connect'] },
-    { mod: 'engagement', label: 'Comment Studio', keywords: ['engagement', 'comment', 'linkedin'] },
+    { mod: 'prospector', label: 'Connections', keywords: ['linkedin', 'connect', 'invite'] },
+    { mod: 'engagement', label: 'Comments', keywords: ['comment', 'reply'] },
+    { mod: 'career', label: 'Career Signals', keywords: ['career', 'role', 'skill'] },
     { mod: 'settings', label: 'Settings', keywords: ['settings', 'profile', 'integration'] },
   ].filter(
     (item) =>

@@ -3,21 +3,19 @@
 import React from 'react';
 import {
   LayoutDashboard,
-  Radar,
   Building2,
   MessageSquareQuote,
   Kanban,
   FileText,
   Image as ImageIcon,
-  Share2,
   BrainCircuit,
   Target,
-  BarChart3,
-  Bot,
   Settings,
   ChevronLeft,
   ChevronRight,
-  UserPlus
+  UserPlus,
+  CalendarDays,
+  Hash
 } from 'lucide-react';
 import { BrandMark } from '@/components/BrandMark';
 
@@ -36,18 +34,16 @@ export function Sidebar({
 }: SidebarProps) {
   const mainNav = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'discover', label: 'Discover Radar', icon: Radar },
-    { id: 'prospector', label: 'LinkedIn Auto-Connect', icon: UserPlus, highlight: true },
-    { id: 'engagement', label: 'Comment Studio', icon: MessageSquareQuote, highlight: true },
-    { id: 'companies', label: 'Companies & People', icon: Building2 },
     { id: 'content', label: 'Content Pipeline', icon: Kanban },
     { id: 'articles', label: 'Technical Articles', icon: FileText },
+    { id: 'topics', label: 'Topics', icon: Hash },
+    { id: 'companies', label: 'Target Companies', icon: Building2 },
+    { id: 'occasions', label: 'Occasions', icon: CalendarDays },
+    { id: 'prospector', label: 'Connections', icon: UserPlus },
+    { id: 'engagement', label: 'Comments', icon: MessageSquareQuote },
     { id: 'media', label: 'Media Library', icon: ImageIcon },
-    { id: 'social', label: 'Social Scheduler', icon: Share2 },
     { id: 'knowledge', label: 'Experience Vault', icon: BrainCircuit },
     { id: 'career', label: 'Career Signals', icon: Target },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'ai', label: 'AI Workspace', icon: Bot },
   ];
 
   return (

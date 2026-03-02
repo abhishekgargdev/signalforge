@@ -11,8 +11,8 @@ import {
   Plus,
   Sparkles,
   User,
-  Shield,
   ExternalLink,
+  LogOut,
   ChevronDown,
   Moon,
   Sun,
@@ -75,13 +75,17 @@ export function Header({
       case 'dashboard':
         return 'Engineering Command Hub';
       case 'discover':
-        return 'Technology Radar & Signal Discovery';
+        return 'Topics';
+      case 'topics':
+        return 'Topics you want to be known for';
+      case 'occasions':
+        return 'Occasions and celebrations';
       case 'prospector':
-        return 'LinkedIn AI Prospector & Automated Connection Cron';
+        return 'People to connect with';
       case 'companies':
-        return 'Target Companies & Decision Makers';
+        return 'Companies to be visible to';
       case 'engagement':
-        return 'FAANG Comment Studio & AI Outreach Engine';
+        return 'Comments prepared for today';
       case 'content':
         return 'Content Pipeline & 10-Step Wizard';
       case 'articles':
@@ -89,15 +93,15 @@ export function Header({
       case 'media':
         return 'Media Library & Cloudinary Hub';
       case 'social':
-        return 'Cross-Platform Social Scheduler';
+        return 'Content Pipeline';
       case 'knowledge':
-        return 'STAR Experience Vault & Architecture Projects';
+        return 'Experience Vault';
       case 'career':
-        return 'Career Signals & Market Alignment';
+        return 'Career Signals';
       case 'analytics':
-        return 'Traffic, Engagement & Audience Analytics';
+        return 'Dashboard';
       case 'ai':
-        return 'AI Workspace & Prompt Library';
+        return 'Content Pipeline';
       case 'settings':
         return 'System Configuration & Audit Logs';
       case 'public-article':
@@ -205,22 +209,15 @@ export function Header({
                   <User className="w-3.5 h-3.5" />
                   <span>Profile & settings</span>
                 </Link>
-                <Link
-                  href="/settings"
-                  className="flex items-center gap-2 px-3 py-1.5 text-zinc-300 hover:bg-[#22c55e]/10 hover:text-emerald-300"
-                  onClick={() => setProfileDropdownOpen(false)}
-                >
-                  <Shield className="w-3.5 h-3.5" />
-                  <span>Security & sessions</span>
-                </Link>
               </div>
 
               <div className="border-t border-[#22c55e]/15 py-1">
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="w-full text-left px-3 py-1.5 text-zinc-400 hover:text-red-300 hover:bg-red-950/30"
+                  className="w-full flex items-center gap-2 text-left px-3 py-1.5 text-zinc-400 hover:text-red-300 hover:bg-red-950/30"
                 >
+                  <LogOut className="w-3.5 h-3.5" />
                   Sign out
                 </button>
               </div>

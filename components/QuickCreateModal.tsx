@@ -26,8 +26,8 @@ export function QuickCreateModal({ isOpen, onClose, onSelectAction }: QuickCreat
     {
       id: 'prospector-connect',
       module: 'prospector',
-      title: 'LinkedIn AI Auto-Connect & Cron',
-      desc: 'Parse thoughts, auto-fill criteria, and schedule daily invites to FAANG leaders',
+      title: 'Review connections',
+      desc: 'People the daily run suggested you can invite',
       icon: UserPlus,
     },
     {
@@ -47,8 +47,8 @@ export function QuickCreateModal({ isOpen, onClose, onSelectAction }: QuickCreat
     {
       id: 'generate-comment',
       module: 'engagement',
-      title: 'Generate Post Comment',
-      desc: 'Analyze target company post and draft 4 anti-spam angles',
+      title: 'Review comments',
+      desc: 'Comments prepared for posts found in the daily run',
       icon: Sparkles,
     },
     {
@@ -68,8 +68,8 @@ export function QuickCreateModal({ isOpen, onClose, onSelectAction }: QuickCreat
     {
       id: 'add-company',
       module: 'companies',
-      title: 'Track New Company',
-      desc: 'Add Tier 1/2 engineering organization to monitor signals',
+      title: 'Add a target company',
+      desc: 'A company you want your posts and articles to reach',
       icon: Building,
     },
   ];

@@ -1,8 +1,5 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import React from 'react';
-import { SocialView } from '@/components/modules/SocialView';
-
-export default function SocialDashboardPage() {
-  return <SocialView />;
+export default function SocialRedirectPage() {
+  redirect('/content');
 }
