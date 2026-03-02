@@ -84,4 +84,38 @@ export class TopicService {
     }
     return newTopic;
   }
+
+  static async update(id: string, data: Partial<TopicSignal>, userId: string): Promise<TopicSignal | null> {
+    await connectToDatabase();
+    if (!isDbConnected() || !mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(userId)) return null;
+    const saved = await Topic.findOneAndUpdate(
+      { _id: id, userId },
+      { title: data.title, summary: data.summary, category: data.category || 'Topic' },
+      { new: true }
+    ).lean();
+    if (!saved) return null;
+    return {
+      id: saved._id.toString(),
+      title: saved.title,
+      category: saved.category,
+      summary: saved.summary,
+      source: saved.source,
+      trendScore: saved.trendScore,
+      freshness: saved.freshness,
+      careerRelevance: saved.careerRelevance,
+      companyRelevance: saved.companyRelevance || [],
+      tags: saved.tags || [],
+      keyFacts: saved.keyFacts || [],
+      timeline: saved.timeline || [],
+      suggestedAngles: saved.suggestedAngles || [],
+      isSaved: saved.isSaved,
+    };
+  }
+
+  static async remove(id: string, userId: string): Promise<boolean> {
+    await connectToDatabase();
+    if (!isDbConnected() || !mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(userId)) return false;
+    const result = await Topic.deleteOne({ _id: id, userId });
+    return result.deletedCount > 0;
+  }
 }

@@ -21,7 +21,7 @@ export class CompanyService {
             technologies: c.technologies || [],
             recentSignalCount: 4,
             engagementCount: 6,
-            headquarters: c.headquarters || '',
+            headquarters: c.website || c.headquarters || '',
             targetRoles: ['Staff Engineer'],
             description: c.description,
             openRolesCount: c.openRolesCount || 0,
@@ -69,11 +69,52 @@ export class CompanyService {
         technologies: newComp.technologies,
         headquarters: newComp.headquarters,
         description: newComp.description,
+        website: data.headquarters || '',
         openRolesCount: newComp.openRolesCount,
         logo: newComp.logo,
       });
       newComp.id = saved._id.toString();
     }
     return newComp;
+  }
+
+  static async update(id: string, data: Partial<TargetCompany>, userId: string): Promise<TargetCompany | null> {
+    await connectToDatabase();
+    if (isDbConnected() && mongoose.Types.ObjectId.isValid(id) && mongoose.Types.ObjectId.isValid(userId)) {
+      const saved = await Company.findOneAndUpdate(
+        { _id: id, userId },
+        {
+          name: data.name,
+          description: data.description,
+          website: data.headquarters,
+          industry: data.industry || 'Technology',
+        },
+        { new: true }
+      ).lean();
+      if (!saved) return null;
+      return {
+        id: saved._id.toString(),
+        name: saved.name,
+        logo: saved.logo || '',
+        industry: saved.industry,
+        priority: saved.priority,
+        technologies: saved.technologies || [],
+        recentSignalCount: 0,
+        engagementCount: 0,
+        headquarters: saved.website || '',
+        targetRoles: [],
+        description: saved.description || '',
+        openRolesCount: saved.openRolesCount || 0,
+        signals: [],
+      };
+    }
+    return null;
+  }
+
+  static async remove(id: string, userId: string): Promise<boolean> {
+    await connectToDatabase();
+    if (!isDbConnected() || !mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(userId)) return false;
+    const result = await Company.deleteOne({ _id: id, userId });
+    return result.deletedCount > 0;
   }
 }

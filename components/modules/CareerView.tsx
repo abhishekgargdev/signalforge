@@ -1,172 +1,156 @@
 'use client';
 
-import React from 'react';
-import {
-  Target,
-  TrendingUp,
-  AlertTriangle,
-  Lightbulb,
-  Building,
-  CheckCircle2,
-  ArrowRight,
-  Shield
-} from 'lucide-react';
-import { CareerGoal } from '@/lib/signalforge-data';
+import React, { useEffect, useState } from 'react';
+import { IdeaBox } from '@/components/IdeaBox';
+import { Pagination } from '@/components/ui/Pagination';
 
-interface CareerViewProps {
-  career: CareerGoal;
-  onNavigateToContent: () => void;
-}
+type Skill = { name: string; matchPercent: number; demand: string };
 
-export function CareerView({ career, onNavigateToContent }: CareerViewProps) {
+export function CareerView() {
+  const [targetRole, setTargetRole] = useState('');
+  const [experienceLevel, setExperienceLevel] = useState('');
+  const [strategy, setStrategy] = useState('');
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [angles, setAngles] = useState<string[]>([]);
+  const [companies, setCompanies] = useState<string[]>([]);
+  const [skillName, setSkillName] = useState('');
+  const [angle, setAngle] = useState('');
+  const [skillPage, setSkillPage] = useState(1);
+  const [anglePage, setAnglePage] = useState(1);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const load = () => {
+    fetch('/api/v1/career')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.success) return;
+        const career = data.data.career;
+        setTargetRole(career.targetRole || '');
+        setExperienceLevel(career.experienceLevel || '');
+        setStrategy(career.strategy || '');
+        setSkills(career.skills || []);
+        setAngles(career.angles || []);
+        setCompanies(career.targetCompanies || []);
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const save = async (next?: { skills?: Skill[]; angles?: string[] }) => {
+    const res = await fetch('/api/v1/career', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        targetRole,
+        experienceLevel,
+        strategy,
+        skills: next?.skills || skills,
+        angles: next?.angles || angles,
+      }),
+    });
+    const data = await res.json();
+    setMessage(data.success ? 'Saved' : data.error?.message || 'Could not save');
+  };
+
+  const skillPages = Math.max(1, Math.ceil(skills.length / 4));
+  const anglePages = Math.max(1, Math.ceil(angles.length / 4));
+
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#22c55e]/20 pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-[#22c55e]" />
-            <h1 className="text-xl font-bold text-slate-100">
-              Career Signals & Market Technology Alignment
-            </h1>
-          </div>
-          <p className="text-xs text-zinc-400 mt-1">
-            Bridge your engineering background with frontier systems demands at target tech organizations.
-          </p>
-        </div>
-
-        <span className="text-xs font-mono text-emerald-400 bg-[#0e1710] px-3 py-1.5 rounded-lg border border-[#22c55e]/20">
-          Target role: {career.targetRole || 'Not set'}
-        </span>
+      <div className="border-b border-[#22c55e]/20 pb-4">
+        <h1 className="text-xl font-bold text-slate-100">Career signals</h1>
+        <p className="mt-1 text-xs text-zinc-400">Role, strategy, skills, and angles the daily draft can use.</p>
       </div>
 
-      {/* Target Focus Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-[#0e1710] border border-[#22c55e]/20 space-y-2">
-          <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">
-            Target Trajectory
-          </span>
-          <div className="font-bold text-sm text-slate-100">{career.targetRole}</div>
-          <div className="text-xs text-zinc-400 font-mono">{career.experienceLevel}</div>
-        </div>
-
-        <div className="p-4 rounded-xl bg-[#0e1710] border border-[#22c55e]/20 space-y-2">
-          <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">
-            Target Companies
-          </span>
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {career.targetCompanies.length === 0 ? (
-              <span className="text-xs text-zinc-500">Add target companies in Settings or Companies.</span>
-            ) : (
-              career.targetCompanies.map((c) => (
-                <span key={c} className="text-xs font-mono px-2 py-0.5 rounded bg-black/50 text-emerald-300 border border-[#22c55e]/20">
-                  {c}
-                </span>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="p-4 rounded-xl bg-[#0e1710] border border-[#22c55e]/20 space-y-2">
-          <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">
-            Strategy Objective
-          </span>
-          <p className="text-xs text-zinc-300 leading-snug">
-            Define how you want to position your expertise for inbound outreach.
-          </p>
-        </div>
+      <div className="grid gap-3 rounded-xl border border-[#22c55e]/20 bg-[#0e1710] p-4">
+        <IdeaBox onFill={setStrategy} />
+        <input value={targetRole} onChange={(e) => setTargetRole(e.target.value)} placeholder="Target role" className="rounded border border-[#22c55e]/30 bg-black/50 p-2 text-xs" />
+        <input value={experienceLevel} onChange={(e) => setExperienceLevel(e.target.value)} placeholder="Experience level" className="rounded border border-[#22c55e]/30 bg-black/50 p-2 text-xs" />
+        <textarea value={strategy} onChange={(e) => setStrategy(e.target.value)} rows={3} placeholder="Strategy objective" className="rounded border border-[#22c55e]/30 bg-black/50 p-2 text-xs" />
+        <button type="button" onClick={() => save()} className="w-fit rounded-lg bg-[#22c55e] px-3 py-1.5 text-xs font-bold text-black">Save profile</button>
+        {message && <p className="text-xs text-emerald-300">{message}</p>}
       </div>
 
-      {/* Rising Skills & Demand Analysis */}
-      <div className="p-5 rounded-xl bg-[#0e1710] border border-[#22c55e]/25 space-y-4">
-        <div className="flex items-center justify-between border-b border-white/5 pb-2">
-          <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-300 font-mono flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-[#22c55e]" />
-            High-Velocity Skill Alignment Matrix
-          </h3>
-          <span className="text-[10px] font-mono text-zinc-500">From your saved career profile</span>
-        </div>
-
-        <div className="space-y-3">
-          {career.risingSkills.length === 0 && (
-            <p className="text-xs text-zinc-500 font-mono p-4 text-center border border-white/5 rounded-lg">
-              No skill alignment data yet.
-            </p>
-          )}
-          {career.risingSkills.map((sk, i) => (
-            <div key={i} className="p-3.5 rounded-lg bg-black/40 border border-white/5 space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-200">{sk.name}</span>
-                <div className="flex items-center gap-2 font-mono">
-                  <span className={`text-[10px] px-2 py-0.5 rounded ${
-                    sk.demand === 'Surging' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-zinc-900 text-zinc-400'
-                  }`}>
-                    {sk.demand} Demand
-                  </span>
-                  <span className="font-bold text-emerald-400">{sk.matchPercent}% Match</span>
-                </div>
-              </div>
-
-              {/* Progress bar */}
-              <div className="w-full h-1.5 rounded-full bg-zinc-800 overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-emerald-600 to-[#22c55e] rounded-full"
-                  style={{ width: `${sk.matchPercent}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="rounded-xl border border-[#22c55e]/20 bg-[#0e1710] p-4">
+        <h2 className="text-sm font-bold text-slate-100">Target companies</h2>
+        <p className="mt-1 text-xs text-zinc-500">{companies.length ? companies.join(', ') : 'Add companies on the Target companies page.'}</p>
       </div>
 
-      {/* Skill Gaps & Strategic Recommendations */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Identified Skill Gaps */}
-        <div className="p-5 rounded-xl bg-[#0e1710] border border-amber-500/20 space-y-3">
-          <h3 className="font-bold text-xs uppercase tracking-wider text-[#f59e0b] font-mono flex items-center gap-1.5">
-            <AlertTriangle className="w-4 h-4 text-[#f59e0b]" />
-            Identified Exploration Frontiers (Not Deficiencies)
-          </h3>
-          <p className="text-xs text-zinc-400">
-            Target teams value transparency on emerging topics you are actively exploring:
-          </p>
-          <div className="space-y-2">
-            {career.skillGaps.length === 0 && (
-              <p className="text-xs text-zinc-500 font-mono">No exploration topics listed.</p>
-            )}
-            {career.skillGaps.map((gap, i) => (
-              <div key={i} className="p-3 rounded-lg bg-black/40 border border-white/5 text-xs text-slate-300">
-                • {gap}
-              </div>
-            ))}
-          </div>
+      <div className="rounded-xl border border-[#22c55e]/20 bg-[#0e1710] p-4 space-y-3">
+        <h2 className="text-sm font-bold text-slate-100">Skills</h2>
+        <div className="flex gap-2">
+          <input value={skillName} onChange={(e) => setSkillName(e.target.value)} placeholder="Skill" className="flex-1 rounded border border-[#22c55e]/30 bg-black/50 p-2 text-xs" />
+          <button
+            type="button"
+            className="rounded-lg bg-[#22c55e] px-3 text-xs font-bold text-black"
+            onClick={() => {
+              if (!skillName.trim()) return;
+              const next = [{ name: skillName.trim(), matchPercent: 50, demand: 'High' }, ...skills];
+              setSkills(next);
+              setSkillName('');
+              save({ skills: next });
+            }}
+          >
+            Add
+          </button>
         </div>
+        {skills.slice((skillPage - 1) * 4, skillPage * 4).map((skill) => (
+          <div key={skill.name} className="flex items-center justify-between text-xs">
+            <span>{skill.name}</span>
+            <button
+              type="button"
+              className="text-red-300"
+              onClick={() => {
+                const next = skills.filter((item) => item.name !== skill.name);
+                setSkills(next);
+                save({ skills: next });
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        ))}
+        <Pagination currentPage={skillPage} totalPages={skillPages} totalItems={skills.length} pageSize={4} onPageChange={setSkillPage} itemLabel="skills" />
+      </div>
 
-        {/* Content Strategy Recommendations */}
-        <div className="p-5 rounded-xl bg-[#0e1710] border border-[#22c55e]/20 space-y-3">
-          <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-300 font-mono flex items-center gap-1.5">
-            <Lightbulb className="w-4 h-4 text-[#22c55e]" />
-            Authority-Building Content Strategy
-          </h3>
-          <p className="text-xs text-zinc-400">
-            Publish these exact angles to close domain perception gaps:
-          </p>
-          <div className="space-y-2">
-            {career.recommendedAngles.length === 0 && (
-              <p className="text-xs text-zinc-500 font-mono">Add content angles as you define your strategy.</p>
-            )}
-            {career.recommendedAngles.map((ang, i) => (
-              <div
-                key={i}
-                onClick={onNavigateToContent}
-                className="p-3 rounded-lg bg-black/40 border border-white/5 text-xs text-emerald-300 hover:border-[#22c55e]/40 transition cursor-pointer flex items-center justify-between group"
-              >
-                <span>{ang}</span>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition flex-shrink-0 ml-2" />
-              </div>
-            ))}
-          </div>
+      <div className="rounded-xl border border-[#22c55e]/20 bg-[#0e1710] p-4 space-y-3">
+        <h2 className="text-sm font-bold text-slate-100">Content angles</h2>
+        <div className="flex gap-2">
+          <input value={angle} onChange={(e) => setAngle(e.target.value)} placeholder="Angle" className="flex-1 rounded border border-[#22c55e]/30 bg-black/50 p-2 text-xs" />
+          <button
+            type="button"
+            className="rounded-lg bg-[#22c55e] px-3 text-xs font-bold text-black"
+            onClick={() => {
+              if (!angle.trim()) return;
+              const next = [angle.trim(), ...angles];
+              setAngles(next);
+              setAngle('');
+              save({ angles: next });
+            }}
+          >
+            Add
+          </button>
         </div>
+        {angles.slice((anglePage - 1) * 4, anglePage * 4).map((item) => (
+          <div key={item} className="flex items-center justify-between text-xs">
+            <span>{item}</span>
+            <button
+              type="button"
+              className="text-red-300"
+              onClick={() => {
+                const next = angles.filter((value) => value !== item);
+                setAngles(next);
+                save({ angles: next });
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        ))}
+        <Pagination currentPage={anglePage} totalPages={anglePages} totalItems={angles.length} pageSize={4} onPageChange={setAnglePage} itemLabel="angles" />
       </div>
     </div>
   );

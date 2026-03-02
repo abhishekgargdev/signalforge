@@ -12,6 +12,30 @@ export async function GET() {
   }
 }
 
+export async function PUT(req: NextRequest) {
+  try {
+    const user = await requireAuth();
+    const body = await req.json();
+    const updated = await TopicService.update(body.id, body, user.id);
+    if (!updated) return standardError('TOPIC_UPDATE_ERROR', 'Topic was not found', 404);
+    return standardResponse({ topic: updated });
+  } catch (err: any) {
+    return standardError('TOPIC_UPDATE_ERROR', err.message || 'Failed to update topic', 500);
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const user = await requireAuth();
+    const id = req.nextUrl.searchParams.get('id') || '';
+    const ok = await TopicService.remove(id, user.id);
+    if (!ok) return standardError('TOPIC_DELETE_ERROR', 'Topic was not found', 404);
+    return standardResponse({ deleted: true });
+  } catch (err: any) {
+    return standardError('TOPIC_DELETE_ERROR', err.message || 'Failed to delete topic', 500);
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const user = await requireAuth();
