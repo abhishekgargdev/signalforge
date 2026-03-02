@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Users,
   Sparkles,
@@ -46,6 +46,17 @@ export function ProspectorView() {
   const [campaign, setCampaign] = useState<ProspectingCampaign>(INITIAL_PROSPECTING_CAMPAIGN);
   const [prospects, setProspects] = useState<LinkedInProspect[]>(INITIAL_LINKEDIN_PROSPECTS);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [linkedinConnected, setLinkedinConnected] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/accounts')
+      .then((res) => res.json())
+      .then((data) => {
+        const linked = (data.data?.accounts || []).some((account: { provider: string }) => account.provider === 'linkedin');
+        setLinkedinConnected(linked);
+      })
+      .catch(() => {});
+  }, []);
 
   // Natural Language Thought Input
   const [thoughtInput, setThoughtInput] = useState('');
@@ -388,14 +399,18 @@ export function ProspectorView() {
           <div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-sm text-slate-100">
-                LinkedIn account
+                {linkedinConnected ? 'LinkedIn connected' : 'LinkedIn not connected'}
               </span>
-              <span className="px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-700 text-[10px] font-mono">
-                Not connected
+              <span className={`px-2 py-0.5 rounded text-[10px] font-mono border ${
+                linkedinConnected
+                  ? 'bg-emerald-950 text-emerald-300 border-emerald-800'
+                  : 'bg-zinc-900 text-zinc-400 border-zinc-700'
+              }`}>
+                {linkedinConnected ? 'OAuth connected' : 'Not connected'}
               </span>
             </div>
             <p className="text-xs text-zinc-400 mt-0.5 font-mono">
-              Connect in Settings to send invites • Daily quota:{' '}
+              {linkedinConnected ? 'Ready to draft invites' : 'Connect LinkedIn in Settings'} • Daily quota:{' '}
               <span className="text-slate-200">{campaign.sentToday}/{campaign.dailyLimit} invites used</span>
             </p>
           </div>

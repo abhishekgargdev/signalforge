@@ -15,8 +15,6 @@ import {
 } from 'lucide-react';
 import { INITIAL_AUDIT_LOGS } from '@/lib/signalforge-data';
 
-type SocialId = 'linkedin' | 'x';
-
 export function SettingsView() {
   const [activeTab, setActiveTab] = useState<'profile' | 'brand' | 'integrations' | 'audit'>('profile');
   const [profileLoading, setProfileLoading] = useState(true);
@@ -27,7 +25,7 @@ export function SettingsView() {
   const [email, setEmail] = useState('');
   const [headline, setHeadline] = useState('');
   const [bio, setBio] = useState('');
-  const [connectNotice, setConnectNotice] = useState<string | null>(null);
+  const [connected, setConnected] = useState<Record<string, { displayName: string }>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -41,6 +39,16 @@ export function SettingsView() {
         setEmail(user.email || '');
         setHeadline(user.headline || '');
         setBio(user.bio || '');
+      })
+    fetch('/api/accounts')
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled || !data.success) return;
+        const map: Record<string, { displayName: string }> = {};
+        for (const account of data.data.accounts || []) {
+          map[account.provider] = { displayName: account.displayName };
+        }
+        setConnected(map);
       })
       .finally(() => {
         if (!cancelled) setProfileLoading(false);
@@ -72,10 +80,19 @@ export function SettingsView() {
     }
   };
 
-  const socialAccounts: { id: SocialId; name: string; desc: string }[] = [
-    { id: 'linkedin', name: 'LinkedIn', desc: 'Publish posts, comments, and connection notes from your account.' },
-    { id: 'x', name: 'X (Twitter)', desc: 'Schedule threads and posts from the social hub.' },
+  const socialAccounts = [
+    { id: 'linkedin', name: 'LinkedIn', desc: 'Publish posts and connection notes from your LinkedIn account.', href: '/api/accounts/linkedin/start' },
+    { id: 'x', name: 'X (Twitter)', desc: 'Read your X profile and schedule posts after you connect.', href: '/api/accounts/x/start' },
   ];
+
+  const disconnect = async (provider: string) => {
+    await fetch(`/api/accounts?provider=${provider}`, { method: 'DELETE' });
+    setConnected((prev) => {
+      const next = { ...prev };
+      delete next[provider];
+      return next;
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -232,34 +249,41 @@ export function SettingsView() {
       {activeTab === 'integrations' && (
         <div className="space-y-4 max-w-2xl text-xs">
           <p className="text-zinc-400">
-            Connect a social account to publish from SignalForge. Nothing is connected until you complete OAuth.
+            Connect LinkedIn or X. Status stays disconnected until OAuth finishes.
           </p>
-          {connectNotice && (
-            <p className="text-[11px] font-mono text-amber-300/90">{connectNotice}</p>
-          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {socialAccounts.map((account) => (
-              <div key={account.id} className="p-4 rounded-xl bg-[#0e1710] border border-[#22c55e]/20 space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-bold text-slate-100">{account.name}</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-700">
-                    Not connected
-                  </span>
+            {socialAccounts.map((account) => {
+              const link = connected[account.id];
+              return (
+                <div key={account.id} className="p-4 rounded-xl bg-[#0e1710] border border-[#22c55e]/20 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-bold text-slate-100">{account.name}</span>
+                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+                      link ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-zinc-900 text-zinc-400 border-zinc-700'
+                    }`}>
+                      {link ? 'Connected' : 'Not connected'}
+                    </span>
+                  </div>
+                  <p className="text-zinc-400">{link ? link.displayName || account.desc : account.desc}</p>
+                  {link ? (
+                    <button
+                      type="button"
+                      onClick={() => disconnect(account.id)}
+                      className="px-3 py-1.5 rounded border border-zinc-700 text-zinc-300"
+                    >
+                      Disconnect
+                    </button>
+                  ) : (
+                    <a
+                      href={account.href}
+                      className="inline-block px-3 py-1.5 rounded bg-[#22c55e]/15 border border-[#22c55e]/40 text-emerald-300 font-semibold"
+                    >
+                      Connect {account.name}
+                    </a>
+                  )}
                 </div>
-                <p className="text-zinc-400">{account.desc}</p>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setConnectNotice(
-                      `${account.name} OAuth is not configured yet. Add the provider credentials, then connect from here.`
-                    )
-                  }
-                  className="px-3 py-1.5 rounded bg-[#22c55e]/15 border border-[#22c55e]/40 text-emerald-300 font-semibold hover:bg-[#22c55e]/25"
-                >
-                  Connect {account.name}
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

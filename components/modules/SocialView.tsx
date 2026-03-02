@@ -1,49 +1,48 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Share2, Smartphone, Monitor } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Share2 } from 'lucide-react';
 
 export function SocialView() {
-  const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [accounts, setAccounts] = useState<{ provider: string; displayName: string }[]>([]);
+
+  useEffect(() => {
+    fetch('/api/accounts')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setAccounts(data.data.accounts || []);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#22c55e]/20 pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <Share2 className="w-5 h-5 text-[#22c55e]" />
-            <h1 className="text-xl font-bold text-slate-100">Cross-Platform Social Hub</h1>
-          </div>
-          <p className="text-xs text-zinc-400 mt-1">Connect accounts and schedule posts from your content pipeline.</p>
+      <div className="border-b border-[#22c55e]/20 pb-4">
+        <div className="flex items-center gap-2">
+          <Share2 className="w-5 h-5 text-[#22c55e]" />
+          <h1 className="text-xl font-bold text-slate-100">Social queue</h1>
         </div>
-        <div className="flex items-center gap-2 bg-[#0e1710] p-1 rounded-lg border border-[#22c55e]/20 text-xs font-mono">
-          <button
-            onClick={() => setDeviceMode('desktop')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded transition ${
-              deviceMode === 'desktop' ? 'bg-[#22c55e] text-black font-bold' : 'text-zinc-400 hover:text-white'
-            }`}
-          >
-            <Monitor className="w-3.5 h-3.5" />
-            <span>Desktop</span>
-          </button>
-          <button
-            onClick={() => setDeviceMode('mobile')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded transition ${
-              deviceMode === 'mobile' ? 'bg-[#22c55e] text-black font-bold' : 'text-zinc-400 hover:text-white'
-            }`}
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span>Mobile</span>
-          </button>
-        </div>
+        <p className="text-xs text-zinc-400 mt-1">Accounts connected in Settings appear here.</p>
       </div>
 
-      <div className="p-10 rounded-xl bg-[#0e1710] border border-[#22c55e]/20 text-center space-y-3">
-        <p className="text-sm text-zinc-400 font-mono">No connected social accounts</p>
-        <p className="text-xs text-zinc-500 max-w-md mx-auto">
-          Link LinkedIn or X in Settings → Integrations. Draft previews will use your scheduled content, not demo posts.
-        </p>
-      </div>
+      {accounts.length === 0 ? (
+        <div className="p-10 rounded-xl bg-[#0e1710] border border-[#22c55e]/20 text-center space-y-3">
+          <p className="text-sm text-zinc-400 font-mono">No social accounts connected</p>
+          <Link href="/settings" className="text-xs text-emerald-400 hover:underline">
+            Connect LinkedIn or X in Settings
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {accounts.map((account) => (
+            <div key={account.provider} className="p-4 rounded-xl bg-[#0e1710] border border-[#22c55e]/20">
+              <div className="font-bold text-sm text-slate-200 capitalize">{account.provider}</div>
+              <div className="text-xs text-zinc-400 font-mono mt-1">{account.displayName || 'Connected'}</div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
