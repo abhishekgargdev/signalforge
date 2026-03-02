@@ -161,7 +161,7 @@ export function Header({
 
         {/* Notifications Bell */}
         <button
-          onClick={onOpenNotifications}
+          onClick={() => router.push('/notifications')}
           className="relative p-2 rounded-lg text-zinc-400 hover:text-emerald-300 hover:bg-[#0e1710] transition border border-transparent hover:border-[#22c55e]/20"
           title="Notifications"
         >

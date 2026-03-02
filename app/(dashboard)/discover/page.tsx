@@ -11,7 +11,7 @@ export default function DiscoverPage() {
   return (
     <DiscoverView
       signals={INITIAL_TOPIC_SIGNALS}
-      onSelectTopic={() => {}}
+      onSelectTopic={(topic) => router.push(`/discover/topics/${topic.id}`)}
       onDraftContent={() => router.push('/content')}
     />
   );

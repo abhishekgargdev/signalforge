@@ -32,4 +32,9 @@ export class EngagementService {
     }
     return inMemoryEngagements;
   }
+
+  static async getById(id: string): Promise<EngagementOpportunity | null> {
+    const all = await this.getAll('session');
+    return all.find((item) => item.id === id) || null;
+  }
 }

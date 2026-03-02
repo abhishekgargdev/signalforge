@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ContentView } from '@/components/modules/ContentView';
 import {
   INITIAL_CONTENT_PIPELINE,
@@ -10,6 +11,10 @@ import {
 } from '@/lib/signalforge-data';
 
 export default function ContentPage() {
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const initialTab =
+    tabParam === 'wizard' || tabParam === 'carousel' || tabParam === 'calendar' ? tabParam : 'kanban';
   const [pipeline, setPipeline] = React.useState(INITIAL_CONTENT_PIPELINE);
 
   const handleAddNewItem = (newItem: ContentItem) => {
@@ -22,6 +27,7 @@ export default function ContentPage() {
       signals={INITIAL_TOPIC_SIGNALS}
       experiences={INITIAL_EXPERIENCES}
       onAddNewContentItem={handleAddNewItem}
+      initialTab={initialTab}
     />
   );
 }
