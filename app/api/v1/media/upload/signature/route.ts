@@ -1,25 +1,27 @@
-import { NextRequest } from 'next/server';
 import { requireAuth, standardResponse, standardError } from '@/lib/auth';
+import { getCloudinaryConfig, signUpload } from '@/lib/cloudinary';
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
-    const user = await requireAuth();
-    const timestamp = Math.round(new Date().getTime() / 1000);
+    await requireAuth();
+    const config = getCloudinaryConfig();
+    if (!config) {
+      return standardError('CLOUDINARY_NOT_CONFIGURED', 'Cloudinary credentials are missing', 500);
+    }
 
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'signalforge_dev';
-    const apiKey = process.env.CLOUDINARY_API_KEY || 'dev_key';
-
-    // Mock signature for dev / testing if secret is not set
-    const signature = `sf_sig_${timestamp}_${user.id}`;
+    const timestamp = String(Math.round(Date.now() / 1000));
+    const folder = 'signalforge/uploads';
+    const signature = signUpload({ folder, timestamp }, config.apiSecret);
 
     return standardResponse({
       signature,
       timestamp,
-      cloudName,
-      apiKey,
-      folder: 'signalforge/uploads',
+      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || config.cloudName,
+      apiKey: config.apiKey,
+      folder,
     });
-  } catch (err: any) {
-    return standardError('MEDIA_SIGNATURE_ERROR', err.message || 'Signature generation failed', 500);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Signature generation failed';
+    return standardError('MEDIA_SIGNATURE_ERROR', message, 500);
   }
 }

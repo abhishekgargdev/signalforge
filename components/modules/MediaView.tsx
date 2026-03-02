@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image as ImageIcon,
   UploadCloud,
@@ -22,6 +22,46 @@ export function MediaView() {
   const [assets, setAssets] = useState<
     { id: string; title: string; format: string; dimensions: string; size: string; folder: string; url: string }[]
   >([]);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const loadAssets = () => {
+    fetch('/api/v1/media')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setAssets(data.data.assets || []);
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    loadAssets();
+  }, []);
+
+  const handleUpload = async (file: File) => {
+    setUploadError(null);
+    const sigRes = await fetch('/api/v1/media/upload/signature', { method: 'POST' });
+    const sigData = await sigRes.json();
+    if (!sigData.success) {
+      setUploadError(sigData.error?.message || 'Could not sign upload');
+      return;
+    }
+    const { signature, timestamp, cloudName, apiKey, folder } = sigData.data;
+    const body = new FormData();
+    body.append('file', file);
+    body.append('api_key', apiKey);
+    body.append('timestamp', timestamp);
+    body.append('signature', signature);
+    body.append('folder', folder);
+    const upload = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      method: 'POST',
+      body,
+    });
+    if (!upload.ok) {
+      setUploadError('Cloudinary rejected the upload');
+      return;
+    }
+    loadAssets();
+  };
 
   // Image prompt generator state
   const [promptTopic, setPromptTopic] = useState('');
@@ -76,15 +116,21 @@ export function MediaView() {
       {activeTab === 'library' && (
         <div className="space-y-4">
           {/* Upload Dropzone Simulator */}
-          <div className="p-6 rounded-xl border-2 border-dashed border-[#22c55e]/30 bg-[#0e1710] hover:border-[#22c55e]/60 transition text-center space-y-2 cursor-pointer">
-            <UploadCloud className="w-8 h-8 text-[#22c55e] mx-auto animate-bounce" />
-            <div className="font-bold text-sm text-slate-200">
-              Drop images or click to upload to Cloudinary
-            </div>
-            <p className="text-xs text-zinc-500 font-mono">
-              Auto-formats to WEBP / AVIF with dynamic CDN edge delivery
-            </p>
-          </div>
+          <label className="p-6 rounded-xl border-2 border-dashed border-[#22c55e]/30 bg-[#0e1710] hover:border-[#22c55e]/60 transition text-center space-y-2 cursor-pointer block">
+            <UploadCloud className="w-8 h-8 text-[#22c55e] mx-auto" />
+            <div className="font-bold text-sm text-slate-200">Upload an image to Cloudinary</div>
+            <p className="text-xs text-zinc-500 font-mono">Signed upload using your cloud name</p>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleUpload(file);
+              }}
+            />
+          </label>
+          {uploadError && <p className="text-xs text-red-300 font-mono">{uploadError}</p>}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {assets.length === 0 && (
