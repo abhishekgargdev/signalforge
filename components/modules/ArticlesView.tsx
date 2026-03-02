@@ -20,6 +20,7 @@ import {
   Check
 } from 'lucide-react';
 import { ArticleItem } from '@/lib/signalforge-data';
+import { IdeaBox } from '@/components/IdeaBox';
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal';
 import { Pagination } from '@/components/ui/Pagination';
 import { ApiSpinner } from '@/components/ui/SkeletonLoader';
@@ -348,6 +349,34 @@ export function ArticlesView({ articles: initialArticles, onOpenPublicArticle }:
                 />
               </div>
 
+              <IdeaBox label="Explain the article" onFill={setEditedMarkdown} />
+              <div>
+                <label className="text-[11px] text-zinc-400 block mb-1">Cover image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="text-xs text-zinc-300"
+                  onChange={async (event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+                    const sigRes = await fetch('/api/v1/media/upload/signature', { method: 'POST' });
+                    const sigData = await sigRes.json();
+                    if (!sigData.success) return;
+                    const { signature, timestamp, cloudName, apiKey, folder } = sigData.data;
+                    const body = new FormData();
+                    body.append('file', file);
+                    body.append('api_key', apiKey);
+                    body.append('timestamp', String(timestamp));
+                    body.append('signature', signature);
+                    body.append('folder', folder);
+                    const upload = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body });
+                    const uploaded = await upload.json();
+                    if (uploaded.secure_url) {
+                      setSelectedArticle((prev) => ({ ...prev, coverImage: uploaded.secure_url }));
+                    }
+                  }}
+                />
+              </div>
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-[11px] text-zinc-400">Content Body (Markdown Supported):</label>

@@ -22,6 +22,7 @@ import {
   X
 } from 'lucide-react';
 import { ContentItem, TopicSignal, ExperienceItem } from '@/lib/signalforge-data';
+import { IdeaBox } from '@/components/IdeaBox';
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal';
 import { ApiSpinner } from '@/components/ui/SkeletonLoader';
 
@@ -76,6 +77,7 @@ export function ContentView({
     hashtags: [] as string[],
     scheduledDate: '',
     mediaType: '',
+    coverImage: '',
   });
 
   const [aiGenerating, setAiGenerating] = useState(false);
@@ -125,7 +127,7 @@ export function ContentView({
       createdDate: new Date().toISOString().split('T')[0],
       scheduledDate: wizardData.scheduledDate,
       tags: wizardData.hashtags.map((h) => h.replace('#', '')),
-      body: `${wizardData.hookText}\n\n${wizardData.bodyText}\n\n${wizardData.ctaText}`,
+      body: `${wizardData.hookText}\n\n${wizardData.bodyText}\n\n${wizardData.ctaText}${wizardData.coverImage ? `\n\nImage: ${wizardData.coverImage}` : ''}`,
     };
     const res = await fetch('/api/v1/content', {
       method: 'POST',
@@ -451,6 +453,10 @@ export function ContentView({
                     className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-slate-100 font-mono text-xs"
                   />
                 </div>
+                <IdeaBox
+                  label="Explain the post"
+                  onFill={(text) => setWizardData((prev) => ({ ...prev, bodyText: text }))}
+                />
                 <div>
                   <span className="text-[10px] text-zinc-500 font-mono uppercase block mb-1">Body Text</span>
                   <textarea
@@ -466,13 +472,32 @@ export function ContentView({
             {/* Step 6: Media */}
             {wizardStep === 6 && (
               <div className="space-y-3">
-                <span className="text-zinc-400 font-mono block">Cloudinary Media Attachment:</span>
-                <div className="p-6 rounded-lg border-2 border-dashed border-[#22c55e]/30 bg-black/40 text-center space-y-2">
-                  <div className="font-bold text-emerald-400">{wizardData.mediaType}</div>
-                  <p className="text-zinc-500 text-xs">
-                    Linked to Cloudinary: <code className="text-zinc-400">speculative-decoding-benchmarks.png</code>
-                  </p>
-                </div>
+                <span className="text-zinc-400 font-mono block">Attach an image</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="text-xs text-zinc-300"
+                  onChange={async (event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+                    const sigRes = await fetch('/api/v1/media/upload/signature', { method: 'POST' });
+                    const sigData = await sigRes.json();
+                    if (!sigData.success) return;
+                    const { signature, timestamp, cloudName, apiKey, folder } = sigData.data;
+                    const body = new FormData();
+                    body.append('file', file);
+                    body.append('api_key', apiKey);
+                    body.append('timestamp', String(timestamp));
+                    body.append('signature', signature);
+                    body.append('folder', folder);
+                    const upload = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body });
+                    const uploaded = await upload.json();
+                    if (uploaded.secure_url) {
+                      setWizardData((prev) => ({ ...prev, coverImage: uploaded.secure_url, mediaType: file.name }));
+                    }
+                  }}
+                />
+                {wizardData.coverImage && <p className="text-xs text-emerald-300 break-all">{wizardData.coverImage}</p>}
               </div>
             )}
 
