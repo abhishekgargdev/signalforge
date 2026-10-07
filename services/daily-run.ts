@@ -127,10 +127,16 @@ async function generateDraftsForUser(userId: unknown, name: string, today: strin
     for (const draft of drafts) created += (await saveDraft(userId, draft)) ? 1 : 0;
   }
 
+  const topicPool = [...topics];
+  for (let index = topicPool.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(Math.random() * (index + 1));
+    [topicPool[index], topicPool[swap]] = [topicPool[swap], topicPool[index]];
+  }
+  const topicCount = topicPool.length <= 2 ? topicPool.length : 2 + Math.floor(Math.random() * 2);
   const topicLines = [];
-  for (const topic of topics) {
-    const postTag = `topic-post:${topic._id}`;
-    const articleTag = `topic-article:${topic._id}`;
+  for (const topic of topicPool.slice(0, topicCount)) {
+    const postTag = `topic-post:${today}:${topic._id}`;
+    const articleTag = `topic-article:${today}:${topic._id}`;
     if (!(await Content.findOne({ userId, tags: postTag }))) topicLines.push(`post tag ${postTag} about ${topic.title}: ${topic.summary || ''}`);
     if (!(await Article.findOne({ userId, 'seo.keywords': articleTag }))) topicLines.push(`article tag ${articleTag} about ${topic.title}`);
   }
