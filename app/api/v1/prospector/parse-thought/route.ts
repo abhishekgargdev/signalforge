@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireAuth, standardResponse, standardError } from '@/lib/auth';
 import { generateText } from '@/lib/ai/provider-chain';
+import { prompt } from '@/lib/prompts';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,9 +13,7 @@ export async function POST(req: NextRequest) {
       return standardError('VALIDATION_ERROR', 'Natural language thought query is required', 400);
     }
 
-    const result = await generateText(`Analyze this search request: "${thought}".
-Return only JSON with keys companies, roles, technologies, seniorities, locations, searchRationale.
-Use empty arrays when the request does not mention a field. Do not invent companies that were not named or clearly implied.`);
+    const result = await generateText(prompt('parse-thought', { thought }), prompt('system'));
 
     const cleaned = result.text.replace(/```json/g, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleaned);

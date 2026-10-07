@@ -7,6 +7,7 @@ import { Profile } from '@/models/Profile';
 import { Experience } from '@/models/Experience';
 import { Company } from '@/models/Company';
 import { Topic } from '@/models/Topic';
+import { prompt } from '@/lib/prompts';
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await AIService.generateTechnicalContent({
-      prompt: `Turn this idea into the field text the user asked for. Keep it specific to their background. Do not add a title line unless the idea is a full post.\n\nIdea:\n${idea}`,
+      prompt: [prompt('post'), prompt('article'), prompt('fill', { idea })].join('\n\n'),
       context,
     });
     return standardResponse({ text: result.text, provider: result.provider, model: result.model });

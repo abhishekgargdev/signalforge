@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireAuth, standardResponse, standardError } from '@/lib/auth';
 import { generateText } from '@/lib/ai/provider-chain';
+import { prompt } from '@/lib/prompts';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,10 +13,17 @@ export async function POST(req: NextRequest) {
       return standardError('VALIDATION_ERROR', 'prospectName and company are required', 400);
     }
 
-    const result = await generateText(`Draft a LinkedIn connection note from ${sessionUser.name || 'the sender'} to ${prospectName} (${role || 'engineering leader'} at ${company}).
-Technical focus: ${(techAlignment || []).join(', ') || 'not specified'}.
-Sender background: ${userBio || sessionUser.bio || 'Do not invent credentials.'}
-Under 280 characters. No flattery. Return only the note.`);
+    const result = await generateText(
+      prompt('connection-note-detailed', {
+        sender: sessionUser.name || 'the sender',
+        prospect: prospectName,
+        role: role || 'engineering leader',
+        company,
+        focus: (techAlignment || []).join(', ') || 'not specified',
+        background: userBio || sessionUser.bio || 'Do not invent credentials.',
+      }),
+      prompt('system')
+    );
 
     const note = result.text.trim().replace(/^"|"$/g, '');
     return standardResponse({

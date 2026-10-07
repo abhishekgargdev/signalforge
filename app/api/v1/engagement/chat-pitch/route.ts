@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireAuth, standardResponse, standardError } from '@/lib/auth';
 import { generateText } from '@/lib/ai/provider-chain';
+import { prompt } from '@/lib/prompts';
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,10 +9,17 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { targetName, company, role, contextTopic, userTargetRole } = body;
 
-    const result = await generateText(`Draft a short LinkedIn message from ${sessionUser.name || 'the sender'} to ${targetName || 'an engineering leader'} (${role || 'leader'} at ${company || 'their company'}).
-Topic: ${contextTopic || 'shared technical interests'}.
-Sender headline: ${userTargetRole || sessionUser.headline || 'not specified'}.
-Maximum 140 words. Do not invent experience. Return only the message.`);
+    const result = await generateText(
+      prompt('chat-pitch', {
+        sender: sessionUser.name || 'the sender',
+        target: targetName || 'an engineering leader',
+        role: role || 'leader',
+        company: company || 'their company',
+        topic: contextTopic || 'shared technical interests',
+        headline: userTargetRole || sessionUser.headline || 'not specified',
+      }),
+      prompt('system')
+    );
 
     return standardResponse({
       message: result.text.trim(),

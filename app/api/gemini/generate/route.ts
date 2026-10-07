@@ -1,25 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { generateText } from '@/lib/ai/provider-chain';
+import { prompt } from '@/lib/prompts';
 
 export async function POST(req: NextRequest) {
   try {
     await requireAuth();
-    const { prompt, type } = await req.json();
-    if (!prompt || !String(prompt).trim()) {
+    const body = await req.json();
+    const userPrompt = body.prompt;
+    const type = body.type;
+    if (!userPrompt || !String(userPrompt).trim()) {
       return NextResponse.json({ success: false, error: 'Prompt is required' }, { status: 400 });
     }
 
-    let systemInstruction =
-      'You are SignalForge. Provide precise technical writing. Do not invent the user\'s employment history.';
-    if (type === 'comment') {
-      systemInstruction =
-        'Write a specific technical comment. Do not use generic praise. Do not invent personal experience.';
-    } else if (type === 'article_outline') {
-      systemInstruction = 'Outline a technical article with trade-offs and section headings.';
-    }
+    let systemInstruction = prompt('system');
+    if (type === 'comment') systemInstruction = prompt('gemini-comment');
+    else if (type === 'article_outline') systemInstruction = prompt('gemini-article');
 
-    const result = await generateText(String(prompt), systemInstruction);
+    const result = await generateText(String(userPrompt), systemInstruction);
     return NextResponse.json({
       success: true,
       text: result.text,

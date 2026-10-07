@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireAuth, standardResponse, standardError } from '@/lib/auth';
 import { generateText } from '@/lib/ai/provider-chain';
+import { prompt } from '@/lib/prompts';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,27 +14,16 @@ export async function POST(req: NextRequest) {
     }
 
     const senderName = sessionUser.name || 'the author';
-    const prompt = `You are helping ${senderName} write comments on a post by ${authorName || 'an engineering leader'} (${authorRole || 'engineering lead'} at ${company || 'their company'}).
+    const task = prompt('comment-set', {
+      sender: senderName,
+      author: authorName || 'an engineering leader',
+      role: authorRole || 'engineering lead',
+      company: company || 'their company',
+      postText,
+      extra: customContext ? `Additional context: ${customContext}` : '',
+    });
 
-Original post:
-"${postText}"
-
-${customContext ? `Additional context: ${customContext}` : ''}
-
-Do not invent employers, metrics, or personal war stories that were not supplied.
-Generate exactly 4 comments. Respond with ONLY valid JSON:
-{
-  "problemSummary": "1 sentence",
-  "whyEngage": "1 sentence",
-  "comments": [
-    { "angle": "Technical insight", "commentText": "", "originalityScore": 0 },
-    { "angle": "Personal perspective", "commentText": "", "originalityScore": 0 },
-    { "angle": "Constructive question", "commentText": "", "originalityScore": 0 },
-    { "angle": "Alternative perspective", "commentText": "", "originalityScore": 0 }
-  ]
-}`;
-
-    const result = await generateText(prompt);
+    const result = await generateText(task, prompt('system'));
     const cleaned = result.text.replace(/```json/g, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleaned);
 

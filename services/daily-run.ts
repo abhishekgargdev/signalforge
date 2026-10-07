@@ -10,17 +10,16 @@ import { Article } from '@/models/Article';
 import { Profile } from '@/models/Profile';
 import { ConnectionLead } from '@/models/ConnectionLead';
 import { CommentDraft } from '@/models/CommentDraft';
+import { prompt } from '@/lib/prompts';
 
 function dayKey(date = new Date()) {
   return date.toISOString().slice(0, 10);
 }
 
-async function draftText(prompt: string, voice?: string) {
-  const system = voice?.trim()
-    ? voice
-    : 'Write in the user\'s voice. Do not invent employers or metrics.';
+async function draftText(task: string, voice?: string) {
+  const system = [prompt('system'), voice?.trim() || ''].filter(Boolean).join('\n\n');
   try {
-    const result = await generateText(prompt, system);
+    const result = await generateText(task, system);
     return result.text;
   } catch {
     return '';
@@ -49,9 +48,9 @@ function parseDrafts(text: string): DraftItem[] {
   }
 }
 
-async function askDrafts(instruction: string, voice?: string) {
+async function askDrafts(task: string, voice?: string) {
   const text = await draftText(
-    `${instruction}\n\nReturn only a JSON array. Each object has title, body, tag, and kind ("post" or "article").`,
+    [prompt('json-drafts'), prompt('post'), prompt('article'), task].join('\n\n'),
     voice
   );
   return parseDrafts(text);
@@ -109,7 +108,10 @@ async function generateDraftsForUser(userId: unknown, name: string, today: strin
   }
   if (missingOccasions.length) {
     const drafts = await askDrafts(
-      `${background}\nWrite one LinkedIn post for each occasion:\n${missingOccasions.map((item) => `- tag ${item.tag}; ${item.name} on ${item.date}; ${item.note}`).join('\n')}`,
+      prompt('occasion', {
+        background,
+        items: missingOccasions.map((item) => `- tag ${item.tag}; ${item.name} on ${item.date}; ${item.note}`).join('\n'),
+      }),
       voice
     );
     for (const draft of drafts) created += (await saveDraft(userId, { ...draft, kind: 'post' })) ? 1 : 0;
@@ -123,7 +125,7 @@ async function generateDraftsForUser(userId: unknown, name: string, today: strin
     if (!(await Article.findOne({ userId, 'seo.keywords': articleTag }))) companyLines.push(`article tag ${articleTag} for ${company.name}`);
   }
   if (companyLines.length) {
-    const drafts = await askDrafts(`${background}\nWrite these company pieces so the company would notice this person:\n${companyLines.join('\n')}`, voice);
+    const drafts = await askDrafts(prompt('company', { background, items: companyLines.join('\n') }), voice);
     for (const draft of drafts) created += (await saveDraft(userId, draft)) ? 1 : 0;
   }
 
@@ -141,25 +143,19 @@ async function generateDraftsForUser(userId: unknown, name: string, today: strin
     if (!(await Article.findOne({ userId, 'seo.keywords': articleTag }))) topicLines.push(`article tag ${articleTag} about ${topic.title}`);
   }
   if (topicLines.length) {
-    const drafts = await askDrafts(`${background}\nWrite these topic pieces:\n${topicLines.join('\n')}`, voice);
+    const drafts = await askDrafts(prompt('topic', { background, items: topicLines.join('\n') }), voice);
     for (const draft of drafts) created += (await saveDraft(userId, draft)) ? 1 : 0;
   }
 
   const newsTag = `news:${today}`;
   if (!(await Content.findOne({ userId, tags: new RegExp(`^${newsTag}:`) }))) {
-    const drafts = await askDrafts(
-      `${background}\nWrite 7 LinkedIn posts about notable technology news or achievements from around ${today}. Tags must be ${newsTag}:1 through ${newsTag}:7. kind is post.`,
-      voice
-    );
+    const drafts = await askDrafts(prompt('news', { background, today, newsTag }), voice);
     for (const draft of drafts.slice(0, 10)) created += (await saveDraft(userId, { ...draft, kind: 'post' })) ? 1 : 0;
   }
 
   const achievementTag = `achievement:${today}`;
   if (!(await Content.findOne({ userId, tags: achievementTag }))) {
-    const drafts = await askDrafts(
-      `${background}\nWrite one LinkedIn post about one major world achievement relevant to an engineer. tag ${achievementTag}. kind post.`,
-      voice
-    );
+    const drafts = await askDrafts(prompt('achievement', { background, tag: achievementTag }), voice);
     for (const draft of drafts.slice(0, 1)) created += (await saveDraft(userId, { ...draft, kind: 'post', tag: achievementTag })) ? 1 : 0;
   }
 
@@ -194,7 +190,11 @@ export async function runDailyForAllUsers() {
     const leadCount = await ConnectionLead.countDocuments({ userId, dayKey: today });
     if (leadCount === 0 && companies.length > 0) {
       for (const company of companies.slice(0, 5)) {
-        const note = await draftText(`Write a 2-sentence connection note from ${user.name} to an engineer at ${company.name}. Reason: ${company.description || 'shared technical work'}.`);
+        const note = await draftText(prompt('connection-note', {
+          sender: user.name,
+          company: company.name,
+          reason: company.description || 'shared technical work',
+        }));
         await ConnectionLead.create({
           userId,
           name: `Engineer at ${company.name}`,
@@ -214,7 +214,7 @@ export async function runDailyForAllUsers() {
       for (let index = 0; index < 5; index += 1) {
         const topic = topics.length ? topics[index % topics.length] : null;
         const subject = topic?.title || 'a technical lesson from your work';
-        const comment = await draftText(`Write a short LinkedIn comment on a post about ${subject}. Person: ${user.name}. Do not pretend you read a specific post.`);
+        const comment = await draftText(prompt('comment', { subject, sender: user.name }));
         await CommentDraft.create({
           userId,
           author: topic ? `Post about ${topic.title}` : `Suggested post ${index + 1}`,
