@@ -8,7 +8,7 @@ import { Eye, EyeOff, Lock, Mail, ArrowRight, RefreshCw, AlertCircle } from 'luc
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('Password123');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,8 +60,10 @@ export default function LoginPage() {
             <input
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="name@work-email.com"
               className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-black/60 border border-[#22c55e]/30 text-emerald-200 placeholder-zinc-600 focus:outline-none focus:border-[#22c55e]"
             />
           </div>
@@ -82,8 +84,10 @@ export default function LoginPage() {
             <input
               type={showPassword ? 'text' : 'password'}
               required
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
               className="w-full pl-9 pr-10 py-2.5 rounded-lg bg-black/60 border border-[#22c55e]/30 text-emerald-200 placeholder-zinc-600 focus:outline-none focus:border-[#22c55e]"
             />
             <button

@@ -388,14 +388,14 @@ export function ProspectorView() {
           <div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-sm text-slate-100">
-                Connected LinkedIn Account: Abhishek Garg
+                LinkedIn account
               </span>
-              <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-mono">
-                OAuth 2.0 Active
+              <span className="px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-700 text-[10px] font-mono">
+                Not connected
               </span>
             </div>
             <p className="text-xs text-zinc-400 mt-0.5 font-mono">
-              Role Focus: <span className="text-emerald-400">Staff Systems & AI Architect</span> • Daily Quota:{' '}
+              Connect in Settings to send invites • Daily quota:{' '}
               <span className="text-slate-200">{campaign.sentToday}/{campaign.dailyLimit} invites used</span>
             </p>
           </div>
@@ -447,7 +447,7 @@ export function ProspectorView() {
             rows={2}
             value={thoughtInput}
             onChange={(e) => setThoughtInput(e.target.value)}
-            placeholder="e.g. I want to connect with Engineering Managers and Staff AI engineers at FAANG (Google, Meta, Netflix) who post about distributed training and inference..."
+            placeholder="Describe who you want to connect with (roles, companies, technologies)..."
             className="flex-1 p-3 rounded-lg bg-black/60 border border-[#22c55e]/30 text-xs text-emerald-200 placeholder-zinc-600 focus:outline-none focus:border-[#22c55e] font-mono resize-none leading-relaxed"
           />
 
@@ -1236,7 +1236,7 @@ export function ProspectorView() {
                   <label className="text-zinc-400 block mb-1">Full Name *:</label>
                   <input
                     type="text"
-                    placeholder="e.g. Sanjay Ghemawat"
+                    placeholder="Full name"
                     value={newProspectData.name || ''}
                     onChange={(e) => setNewProspectData({ ...newProspectData, name: e.target.value })}
                     className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-emerald-200 focus:outline-none focus:border-[#22c55e]"
@@ -1246,7 +1246,7 @@ export function ProspectorView() {
                   <label className="text-zinc-400 block mb-1">Company *:</label>
                   <input
                     type="text"
-                    placeholder="e.g. Google"
+                    placeholder="Company name"
                     value={newProspectData.currentCompany || ''}
                     onChange={(e) => setNewProspectData({ ...newProspectData, currentCompany: e.target.value })}
                     className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-emerald-200 focus:outline-none focus:border-[#22c55e]"
@@ -1259,7 +1259,7 @@ export function ProspectorView() {
                   <label className="text-zinc-400 block mb-1">Role Title:</label>
                   <input
                     type="text"
-                    placeholder="e.g. Google Fellow / Systems Architect"
+                    placeholder="Role or title"
                     value={newProspectData.role || ''}
                     onChange={(e) => setNewProspectData({ ...newProspectData, role: e.target.value })}
                     className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-emerald-200 focus:outline-none focus:border-[#22c55e]"

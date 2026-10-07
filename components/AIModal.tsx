@@ -102,7 +102,7 @@ export function AIModal({ isOpen, onClose }: AIModalProps) {
               rows={3}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="e.g. Analyze this post on tiered WAL postgres replication: 'Separating storage from compute is the future of databases...'"
+              placeholder="Paste text or describe what you want the assistant to analyze..."
               className="w-full p-3 rounded-lg bg-[#0e1710] border border-[#22c55e]/30 text-xs text-emerald-200 placeholder-zinc-600 focus:outline-none focus:border-[#22c55e] font-mono resize-none"
             />
           </div>

@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [acceptTerms, setAcceptTerms] = useState(true);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,7 +69,8 @@ export default function SignupPage() {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Abhishek Garg"
+            placeholder="Your full name"
+            autoComplete="name"
             className="w-full px-3 py-2 rounded-lg bg-black/60 border border-[#22c55e]/30 text-emerald-200 placeholder-zinc-600 focus:outline-none focus:border-[#22c55e]"
           />
         </div>
@@ -81,7 +82,8 @@ export default function SignupPage() {
             required
             value={username}
             onChange={(e) => setUsername(e.target.value.toLowerCase())}
-            placeholder="e.g. abhishekgarg"
+            placeholder="Choose a username"
+            autoComplete="username"
             className="w-full px-3 py-2 rounded-lg bg-black/60 border border-[#22c55e]/30 text-emerald-200 placeholder-zinc-600 focus:outline-none focus:border-[#22c55e]"
           />
         </div>
@@ -93,7 +95,8 @@ export default function SignupPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
+            placeholder="name@work-email.com"
+            autoComplete="email"
             className="w-full px-3 py-2 rounded-lg bg-black/60 border border-[#22c55e]/30 text-emerald-200 placeholder-zinc-600 focus:outline-none focus:border-[#22c55e]"
           />
         </div>
@@ -106,8 +109,9 @@ export default function SignupPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-3 py-2 rounded-lg bg-black/60 border border-[#22c55e]/30 text-emerald-200 focus:outline-none focus:border-[#22c55e]"
+              placeholder="At least 8 characters"
+              autoComplete="new-password"
+              className="w-full px-3 py-2 rounded-lg bg-black/60 border border-[#22c55e]/30 text-emerald-200 placeholder-zinc-600 focus:outline-none focus:border-[#22c55e]"
             />
           </div>
           <div>
@@ -117,11 +121,31 @@ export default function SignupPage() {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-3 py-2 rounded-lg bg-black/60 border border-[#22c55e]/30 text-emerald-200 focus:outline-none focus:border-[#22c55e]"
+              placeholder="Re-enter password"
+              autoComplete="new-password"
+              className="w-full px-3 py-2 rounded-lg bg-black/60 border border-[#22c55e]/30 text-emerald-200 placeholder-zinc-600 focus:outline-none focus:border-[#22c55e]"
             />
           </div>
         </div>
+
+        <label className="flex items-start gap-2 text-[11px] text-zinc-400 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={acceptTerms}
+            onChange={(e) => setAcceptTerms(e.target.checked)}
+            className="mt-0.5 rounded border-[#22c55e]/40"
+          />
+          <span>
+            I agree to the{' '}
+            <Link href="/terms" className="text-emerald-400 hover:underline">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link href="/privacy" className="text-emerald-400 hover:underline">
+              Privacy Policy
+            </Link>
+          </span>
+        </label>
 
         <div className="pt-2">
           <button

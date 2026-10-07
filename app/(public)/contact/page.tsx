@@ -39,8 +39,8 @@ export default function ContactPage() {
               <input
                 type="text"
                 required
-                placeholder="e.g. Elena Rostova"
-                className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-slate-200 focus:outline-none"
+                placeholder="Your name"
+                className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-slate-200 placeholder-zinc-600 focus:outline-none"
               />
             </div>
 
@@ -49,8 +49,9 @@ export default function ContactPage() {
               <input
                 type="email"
                 required
-                placeholder="elena@company.com"
-                className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-slate-200 focus:outline-none"
+                placeholder="name@work-email.com"
+                autoComplete="email"
+                className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-slate-200 placeholder-zinc-600 focus:outline-none"
               />
             </div>
 
@@ -59,8 +60,8 @@ export default function ContactPage() {
               <textarea
                 rows={4}
                 required
-                placeholder="Describe your inquiry..."
-                className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-slate-200 focus:outline-none resize-none"
+                placeholder="How can we help?"
+                className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-slate-200 placeholder-zinc-600 focus:outline-none resize-none"
               />
             </div>
 

@@ -895,7 +895,7 @@ export function CompaniesView({
                   <label className="text-zinc-400 block mb-1">Name *:</label>
                   <input
                     type="text"
-                    placeholder="e.g. Jeff Dean"
+                    placeholder="Full name"
                     value={newPerson.name}
                     onChange={(e) => setNewPerson({ ...newPerson, name: e.target.value })}
                     className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-emerald-200 focus:outline-none focus:border-[#22c55e]"
@@ -905,7 +905,7 @@ export function CompaniesView({
                   <label className="text-zinc-400 block mb-1">Company *:</label>
                   <input
                     type="text"
-                    placeholder="e.g. Google"
+                    placeholder="Company name"
                     value={newPerson.company}
                     onChange={(e) => setNewPerson({ ...newPerson, company: e.target.value })}
                     className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-emerald-200 focus:outline-none focus:border-[#22c55e]"
@@ -918,7 +918,7 @@ export function CompaniesView({
                   <label className="text-zinc-400 block mb-1">Role Title:</label>
                   <input
                     type="text"
-                    placeholder="e.g. Senior Director of Systems"
+                    placeholder="Role or title"
                     value={newPerson.role}
                     onChange={(e) => setNewPerson({ ...newPerson, role: e.target.value })}
                     className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-emerald-200 focus:outline-none focus:border-[#22c55e]"

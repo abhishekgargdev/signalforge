@@ -4,7 +4,7 @@ import { GoogleGenAI } from '@google/genai';
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAuth();
+    const sessionUser = await requireAuth();
     const body = await req.json();
     const { targetName, company, role, contextTopic, userTargetRole } = body;
 
@@ -15,17 +15,17 @@ export async function POST(req: NextRequest) {
         const ai = new GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
           model: 'gemini-2.5-flash',
-          contents: `You are drafting a concise, respectful, high-impact direct message (LinkedIn Chat / InMail) from Abhishek Garg (Staff Systems & AI Architect candidate) to:
-Target: ${targetName || 'Engineering Leader'} (${role || 'Leader'} at ${company || 'FAANG Company'})
-Context: They recently interacted with our technical commentary regarding "${contextTopic || 'distributed infrastructure'}".
-Objective: Express interest in Staff / Senior engineering opportunities on their team, linking to our technical essays.
+          contents: `You are drafting a concise, respectful direct message (LinkedIn chat or InMail) from ${sessionUser.name || 'the sender'} to:
+Target: ${targetName || 'an engineering leader'} (${role || 'leader'} at ${company || 'their company'})
+Context: Recent interaction or topic: "${contextTopic || 'shared technical interests'}".
+Sender's target role: ${userTargetRole || 'senior engineering role'}.
 
 CONSTRAINTS:
 1. Max 100-140 words.
-2. Direct, humble yet confident tone.
-3. Mention specific systems alignment (e.g. speculative inference decoding, eBPF telemetry, tiered WAL Postgres).
-4. Concrete CTA (e.g. "If you have 15 minutes next week, I'd welcome a brief chat").
-Return only the text of the message.`,
+2. Direct, humble, professional tone.
+3. Reference specific technical alignment only when provided in context.
+4. End with a clear, low-pressure call to action.
+Return only the message text.`,
           config: {
             temperature: 0.6,
           },

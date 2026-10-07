@@ -74,13 +74,11 @@ export function PublicArticleView({ article, onBackToApp }: PublicArticleViewPro
           {/* Author Card */}
           <div className="flex items-center gap-3 pt-3 border-t border-zinc-800">
             <div className="w-10 h-10 rounded-full bg-emerald-900 border border-emerald-500/40 flex items-center justify-center font-bold text-emerald-300 text-sm">
-              AG
+              —
             </div>
             <div>
-              <div className="font-bold text-xs text-slate-200">Abhishek Garg</div>
-              <div className="text-[11px] text-zinc-400 font-sans">
-                Staff AI & Systems Architect • Targeting High Concurrency
-              </div>
+              <div className="font-bold text-xs text-slate-200">Author</div>
+              <div className="text-[11px] text-zinc-400 font-sans">Set your public profile in Settings</div>
             </div>
           </div>
         </div>
@@ -124,12 +122,12 @@ export function PublicArticleView({ article, onBackToApp }: PublicArticleViewPro
         <div className="p-6 rounded-xl bg-[#0e1710] border border-[#22c55e]/30 space-y-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-[#22c55e] text-black font-extrabold flex items-center justify-center text-base">
-              AG
+              —
             </div>
             <div>
-              <h4 className="font-bold text-sm text-slate-100">Written by Abhishek Garg</h4>
+              <h4 className="font-bold text-sm text-slate-100">About the author</h4>
               <p className="text-xs text-zinc-400 font-sans">
-                Senior Infrastructure & AI Systems Architect writing deep-dives on speculative decoding, eBPF, and tiered storage engines.
+                Bio and headline are configured in your workspace settings.
               </p>
             </div>
           </div>

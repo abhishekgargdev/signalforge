@@ -4,7 +4,7 @@ import { GoogleGenAI } from '@google/genai';
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAuth();
+    const sessionUser = await requireAuth();
     const body = await req.json();
     const { authorName, company, authorRole, postText, customContext } = body;
 
@@ -17,7 +17,8 @@ export async function POST(req: NextRequest) {
     if (apiKey) {
       try {
         const ai = new GoogleGenAI({ apiKey });
-        const prompt = `You are an elite Staff / Principal Systems Architect and AI Infrastructure candidate (Abhishek Garg) writing comments on a LinkedIn post by ${authorName || 'an Engineering Leader'} (${authorRole || 'Engineering Lead'} at ${company || 'a top tech company'}).
+        const senderName = sessionUser.name || 'the author';
+        const prompt = `You are helping ${senderName}, a senior systems engineer, write comments on a LinkedIn post by ${authorName || 'an engineering leader'} (${authorRole || 'engineering lead'} at ${company || 'their company'}).
 
 Original Post:
 "${postText}"

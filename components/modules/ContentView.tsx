@@ -478,8 +478,8 @@ export function ContentView({
                     AG
                   </div>
                   <div>
-                    <div className="font-bold text-slate-200 text-xs">Abhishek Garg</div>
-                    <div className="text-[10px] text-zinc-500">Staff AI & Systems Architect • 1h</div>
+                    <div className="font-bold text-slate-200 text-xs">Your name</div>
+                    <div className="text-[10px] text-zinc-500">Your headline • preview</div>
                   </div>
                 </div>
                 <div className="text-xs text-slate-200 font-mono whitespace-pre-wrap leading-relaxed">

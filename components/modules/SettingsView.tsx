@@ -77,7 +77,7 @@ export function SettingsView() {
               <label className="font-mono text-zinc-400 block mb-1">Target Role Headline:</label>
               <input
                 type="text"
-                placeholder="e.g. Staff Software Engineer"
+                placeholder="Target role or headline"
                 className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none placeholder-zinc-600"
               />
             </div>

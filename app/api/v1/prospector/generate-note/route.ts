@@ -4,7 +4,7 @@ import { GoogleGenAI } from '@google/genai';
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAuth();
+    const sessionUser = await requireAuth();
     const body = await req.json();
     const { prospectName, company, role, techAlignment, userBio } = body;
 
@@ -19,12 +19,12 @@ export async function POST(req: NextRequest) {
         const ai = new GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
           model: 'gemini-2.5-flash',
-          contents: `You are drafting a high-converting, personalized LinkedIn connection note from Abhishek Garg (Staff Systems & AI Architect candidate) to:
+          contents: `You are drafting a personalized LinkedIn connection note from ${sessionUser.name || 'the sender'} to:
 Name: ${prospectName}
 Company: ${company}
-Role: ${role || 'Engineering Leader'}
-Technical focus: ${(techAlignment || []).join(', ')}
-User Background: Specializing in speculative decoding inference, eBPF kernel tracing, and tiered WAL replication.
+Role: ${role || 'engineering leader'}
+Technical focus: ${(techAlignment || []).join(', ') || 'not specified'}
+Sender background: ${userBio || 'Use a neutral professional tone; do not invent credentials.'}
 
 CRITICAL CONSTRAINTS:
 1. MUST BE STRICTLY UNDER 280 CHARACTERS (LinkedIn note limit is 300 characters).

@@ -52,7 +52,7 @@ export function ArticlesView({ articles: initialArticles, onOpenPublicArticle }:
   const [addArticleModalOpen, setAddArticleModalOpen] = useState<boolean>(false);
   const [newTitle, setNewTitle] = useState('');
   const [newSubtitle, setNewSubtitle] = useState('');
-  const [newCategory, setNewCategory] = useState('Systems Architecture');
+  const [newCategory, setNewCategory] = useState('');
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -435,7 +435,7 @@ export function ArticlesView({ articles: initialArticles, onOpenPublicArticle }:
                 <label className="text-zinc-400 block mb-1">Article Headline *:</label>
                 <input
                   type="text"
-                  placeholder="e.g. Zero-Copy eBPF Ring Buffers in High-Throughput Storage"
+                  placeholder="Article title"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-emerald-200 focus:outline-none focus:border-[#22c55e]"
@@ -448,7 +448,8 @@ export function ArticlesView({ articles: initialArticles, onOpenPublicArticle }:
                   type="text"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-slate-200 focus:outline-none focus:border-[#22c55e]"
+                  placeholder="e.g. Systems, AI, Infrastructure"
+                  className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-slate-200 placeholder-zinc-600 focus:outline-none focus:border-[#22c55e]"
                 />
               </div>
 

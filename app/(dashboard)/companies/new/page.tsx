@@ -43,7 +43,7 @@ export default function NewCompanyPage() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. OpenAI"
+              placeholder="Company name"
               className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-emerald-200 focus:outline-none focus:border-[#22c55e]"
             />
           </div>
@@ -55,7 +55,7 @@ export default function NewCompanyPage() {
               required
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
-              placeholder="e.g. Frontier AI & Reasoning"
+              placeholder="Industry or focus area"
               className="w-full p-2.5 rounded bg-black/60 border border-[#22c55e]/30 text-emerald-200 focus:outline-none focus:border-[#22c55e]"
             />
           </div>

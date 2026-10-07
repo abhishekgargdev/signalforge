@@ -91,7 +91,7 @@ export function Sidebar({
               Active Workspace
             </div>
             <div className="flex items-center justify-between text-xs font-semibold text-emerald-300">
-              <span className="truncate">Staff AI & Systems Eng</span>
+              <span className="truncate">My workspace</span>
               <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse" />
             </div>
           </div>

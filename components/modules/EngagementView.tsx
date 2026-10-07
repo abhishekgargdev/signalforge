@@ -71,8 +71,8 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
   // Custom post analyzer / Add post modal state
   const [customPostModalOpen, setCustomPostModalOpen] = useState(false);
   const [customAuthor, setCustomAuthor] = useState('');
-  const [customCompany, setCustomCompany] = useState('Google');
-  const [customRole, setCustomRole] = useState('Staff Engineer / Hiring Manager');
+  const [customCompany, setCustomCompany] = useState('');
+  const [customRole, setCustomRole] = useState('');
   const [customPostText, setCustomPostText] = useState('');
   const [analyzingCustomPost, setAnalyzingCustomPost] = useState(false);
 
@@ -1028,7 +1028,7 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
                 <label className="text-zinc-400 block mb-1">Author Name *:</label>
                 <input
                   type="text"
-                  placeholder="e.g. Jeff Dean"
+                  placeholder="Author name"
                   value={customAuthor}
                   onChange={(e) => setCustomAuthor(e.target.value)}
                   className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-slate-200 focus:outline-none focus:border-[#22c55e]"
@@ -1039,7 +1039,7 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
                 <label className="text-zinc-400 block mb-1">Target Company *:</label>
                 <input
                   type="text"
-                  placeholder="e.g. Google DeepMind"
+                  placeholder="Company name"
                   value={customCompany}
                   onChange={(e) => setCustomCompany(e.target.value)}
                   className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-slate-200 focus:outline-none focus:border-[#22c55e]"
@@ -1051,7 +1051,7 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
               <label className="text-zinc-400 block mb-1">Author Role / Team:</label>
               <input
                 type="text"
-                placeholder="e.g. VP / Fellow, Chief Scientist"
+                placeholder="Role or title"
                 value={customRole}
                 onChange={(e) => setCustomRole(e.target.value)}
                 className="w-full p-2 rounded bg-black/60 border border-zinc-700 text-slate-200 focus:outline-none focus:border-[#22c55e]"
