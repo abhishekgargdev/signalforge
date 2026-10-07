@@ -234,7 +234,7 @@ export function CompaniesView({
         name: newPerson.name,
         company: newPerson.company || 'Tech Company',
         role: newPerson.role || 'Engineering Lead',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128&fit=crop&crop=face',
+        avatar: '',
         profileUrl: newPerson.profileUrl || 'https://linkedin.com/in/',
         topics: newPerson.topics || ['Distributed Systems'],
         priority: newPerson.priority || 'High',
@@ -601,14 +601,16 @@ export function CompaniesView({
                       <td className="py-3 px-3 font-semibold text-slate-100">
                         <div className="flex items-center gap-2">
                           <span>{p.name}</span>
-                          <a
-                            href={p.profileUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-[#0077b5] hover:text-sky-300"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
+                          {p.profileUrl && !p.profileUrl.endsWith('/in/') && (
+                            <a
+                              href={p.profileUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-[#0077b5] hover:text-sky-300"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
                         </div>
                       </td>
                       <td className="py-3 px-3 text-zinc-300">

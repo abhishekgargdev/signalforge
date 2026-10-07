@@ -18,8 +18,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
-  Globe,
-  Radio,
   UserPlus
 } from 'lucide-react';
 
@@ -37,24 +35,19 @@ export function Sidebar({
   onToggleCollapse,
 }: SidebarProps) {
   const mainNav = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: 'Live' },
-    { id: 'discover', label: 'Discover Radar', icon: Radar, count: '4' },
-    { id: 'prospector', label: 'LinkedIn Auto-Connect', icon: UserPlus, badge: 'AI Cron', count: '6', highlight: true },
-    { id: 'engagement', label: 'FAANG Comment Studio', icon: MessageSquareQuote, count: '2', highlight: true },
-    { id: 'companies', label: 'Companies & People', icon: Building2, count: '4' },
-    { id: 'content', label: 'Content Pipeline', icon: Kanban, count: '5' },
-    { id: 'articles', label: 'Technical Articles', icon: FileText, count: '2' },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'discover', label: 'Discover Radar', icon: Radar },
+    { id: 'prospector', label: 'LinkedIn Auto-Connect', icon: UserPlus, highlight: true },
+    { id: 'engagement', label: 'Comment Studio', icon: MessageSquareQuote, highlight: true },
+    { id: 'companies', label: 'Companies & People', icon: Building2 },
+    { id: 'content', label: 'Content Pipeline', icon: Kanban },
+    { id: 'articles', label: 'Technical Articles', icon: FileText },
     { id: 'media', label: 'Media Library', icon: ImageIcon },
     { id: 'social', label: 'Social Scheduler', icon: Share2 },
-    { id: 'knowledge', label: 'Experience Vault', icon: BrainCircuit, count: '2' },
+    { id: 'knowledge', label: 'Experience Vault', icon: BrainCircuit },
     { id: 'career', label: 'Career Signals', icon: Target },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'ai', label: 'AI Workspace', icon: Bot },
-  ];
-
-  const publicViews = [
-    { id: 'public-article', label: 'Public Article Reader', icon: Globe },
-    { id: 'public-author', label: 'Public Author Portfolio', icon: Radio },
   ];
 
   return (
@@ -128,49 +121,11 @@ export function Sidebar({
                 {!collapsed && (
                   <span className="truncate text-left flex-1">{item.label}</span>
                 )}
-                {!collapsed && item.count && (
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-emerald-400 border border-[#22c55e]/20">
-                    {item.count}
-                  </span>
-                )}
-                {!collapsed && item.badge && (
-                  <span className="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
-                    {item.badge}
-                  </span>
-                )}
               </button>
             );
           })}
         </nav>
 
-        {/* Public Views Navigation */}
-        {!collapsed && (
-          <div className="px-3 pt-3 pb-1 border-t border-[#22c55e]/15">
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block mb-1">
-              Public Portal
-            </span>
-            <div className="space-y-1">
-              {publicViews.map((pub) => {
-                const Icon = pub.icon;
-                const isActive = currentModule === pub.id;
-                return (
-                  <button
-                    key={pub.id}
-                    onClick={() => onSelectModule(pub.id)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition ${
-                      isActive
-                        ? 'bg-[#0e1710] text-emerald-300 border border-[#22c55e]/30'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#0e1710]/40'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5 text-zinc-500" />
-                    <span className="truncate">{pub.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Bottom Footer Section: Settings & Theme indicator */}

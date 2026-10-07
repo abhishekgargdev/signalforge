@@ -68,8 +68,8 @@ export function SettingsView() {
               <label className="font-mono text-zinc-400 block mb-1">Full Name:</label>
               <input
                 type="text"
-                defaultValue="Abhishek Garg"
-                className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none"
+                placeholder="Your full name"
+                className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none placeholder-zinc-600"
               />
             </div>
 
@@ -77,8 +77,8 @@ export function SettingsView() {
               <label className="font-mono text-zinc-400 block mb-1">Target Role Headline:</label>
               <input
                 type="text"
-                defaultValue="Staff / Principal AI Infrastructure & Distributed Systems Architect"
-                className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none"
+                placeholder="e.g. Staff Software Engineer"
+                className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none placeholder-zinc-600"
               />
             </div>
 
@@ -86,8 +86,8 @@ export function SettingsView() {
               <label className="font-mono text-zinc-400 block mb-1">Technical Bio:</label>
               <textarea
                 rows={3}
-                defaultValue="Specializing in high-throughput streaming systems, speculative inference decoding, eBPF Linux kernel tracing, and tiered WAL storage replication."
-                className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none"
+                placeholder="Short technical bio for your public profile"
+                className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none placeholder-zinc-600"
               />
             </div>
 
@@ -179,16 +179,24 @@ export function SettingsView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/60">
-                {INITIAL_AUDIT_LOGS.map((log) => (
-                  <tr key={log.id} className="hover:bg-white/[0.02] transition">
-                    <td className="py-3 px-3 font-semibold text-slate-200">{log.action}</td>
-                    <td className="py-3 px-3 text-zinc-400">{log.resource}</td>
-                    <td className="py-3 px-3 text-zinc-500">{log.timestamp}</td>
-                    <td className="py-3 px-3 text-right">
-                      <span className="text-emerald-400">{log.status}</span>
+                {INITIAL_AUDIT_LOGS.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-8 px-3 text-center text-zinc-500">
+                      No audit events recorded yet.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  INITIAL_AUDIT_LOGS.map((log) => (
+                    <tr key={log.id} className="hover:bg-white/[0.02] transition">
+                      <td className="py-3 px-3 font-semibold text-slate-200">{log.action}</td>
+                      <td className="py-3 px-3 text-zinc-400">{log.resource}</td>
+                      <td className="py-3 px-3 text-zinc-500">{log.timestamp}</td>
+                      <td className="py-3 px-3 text-right">
+                        <span className="text-emerald-400">{log.status}</span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

@@ -48,9 +48,7 @@ export function ProspectorView() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Natural Language Thought Input
-  const [thoughtInput, setThoughtInput] = useState(
-    'I want to connect with Staff, Principal, and Lead Engineers at FAANG (Google, Meta, Netflix, Apple) and frontier labs (Anthropic, Stripe) who specialize in distributed training, inference scaling, and eBPF kernel telemetry.'
-  );
+  const [thoughtInput, setThoughtInput] = useState('');
   const [parsingThought, setParsingThought] = useState(false);
   const [aiRationale, setAiRationale] = useState<string | null>(null);
 
@@ -315,7 +313,7 @@ export function ProspectorView() {
         companyTier: (newProspectData.companyTier as any) || 'FAANG',
         location: newProspectData.location || 'San Francisco, CA',
         profileUrl: newProspectData.profileUrl || 'https://linkedin.com/in/',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128&fit=crop&crop=face',
+        avatar: '',
         aiMatchScore: newProspectData.aiMatchScore || 95,
         seniority: (newProspectData.seniority as any) || 'Staff',
         techAlignment: newProspectData.techAlignment || ['Distributed Systems'],
@@ -470,36 +468,6 @@ export function ProspectorView() {
               </>
             )}
           </button>
-        </div>
-
-        {/* Quick Thought Presets */}
-        <div className="flex items-center gap-2 flex-wrap text-[11px] font-mono">
-          <span className="text-zinc-500">Try Thought Presets:</span>
-          {[
-            {
-              label: '🎯 FAANG Staff ML & TPU Leads',
-              prompt: 'Connect with Staff and Principal ML Infrastructure engineers at Google and Anthropic working on TPU v5p and speculative decoding.',
-            },
-            {
-              label: '⚡ Meta & Netflix Systems Directors',
-              prompt: 'Target Directors of Engineering and Staff Systems leads at Meta and Netflix specializing in PyTorch FSDP and eBPF kernel tracing.',
-            },
-            {
-              label: '🛡️ Apple & Stripe Platform Leaders',
-              prompt: 'Find Senior Engineering Managers and Staff Infrastructure architects at Apple and Stripe working on CoreML and PostgreSQL WAL replication.',
-            },
-          ].map((preset, idx) => (
-            <button
-              key={idx}
-              onClick={() => {
-                setThoughtInput(preset.prompt);
-                handleParseThought(preset.prompt);
-              }}
-              className="px-2.5 py-1 rounded bg-black/40 border border-white/10 text-zinc-300 hover:text-emerald-300 hover:border-[#22c55e]/40 transition"
-            >
-              {preset.label}
-            </button>
-          ))}
         </div>
 
         {aiRationale && (
@@ -852,15 +820,17 @@ export function ProspectorView() {
                             >
                               {p.name}
                             </span>
-                            <a
-                              href={p.profileUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-[#0077b5] hover:text-[#38bdf8]"
-                              title="Open LinkedIn Profile"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                            </a>
+                            {p.profileUrl && !p.profileUrl.endsWith('/in/') && (
+                              <a
+                                href={p.profileUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[#0077b5] hover:text-[#38bdf8]"
+                                title="Open LinkedIn Profile"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            )}
                           </h3>
                           <p className="text-xs text-emerald-400 font-semibold">{p.currentCompany}</p>
                           <p className="text-[11px] text-zinc-400 leading-snug line-clamp-1">{p.role}</p>
@@ -1095,15 +1065,19 @@ export function ProspectorView() {
             </div>
 
             <div className="pt-3 border-t border-white/5 flex items-center justify-between">
-              <a
-                href={viewingProspect.profileUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[#0077b5] hover:underline flex items-center gap-1"
-              >
-                <Linkedin className="w-3.5 h-3.5 fill-[#0077b5]" />
-                <span>Open Full LinkedIn Profile</span>
-              </a>
+              {viewingProspect.profileUrl && !viewingProspect.profileUrl.endsWith('/in/') ? (
+                <a
+                  href={viewingProspect.profileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[#0077b5] hover:underline flex items-center gap-1"
+                >
+                  <Linkedin className="w-3.5 h-3.5 fill-[#0077b5]" />
+                  <span>Open LinkedIn profile</span>
+                </a>
+              ) : (
+                <span className="text-[11px] text-zinc-500 font-mono">Add a profile URL to open LinkedIn</span>
+              )}
 
               <div className="flex gap-2">
                 <button

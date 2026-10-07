@@ -8,8 +8,6 @@ import { CommandPalette } from '@/components/CommandPalette';
 import { NotificationDrawer } from '@/components/NotificationDrawer';
 import { QuickCreateModal } from '@/components/QuickCreateModal';
 import { AIModal } from '@/components/AIModal';
-import { INITIAL_NOTIFICATIONS } from '@/lib/signalforge-data';
-
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -29,10 +27,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const handleNavigate = (mod: string) => {
     if (mod === 'dashboard') router.push('/dashboard');
     else if (mod === 'articles') router.push('/dashboard/articles');
-    else if (mod.startsWith('public-')) {
-      if (mod === 'public-article') router.push('/articles/speculative-decoding-production-llms');
-      else router.push('/author/abhishekgarg');
-    } else {
+    else if (mod === 'public-article') router.push('/articles');
+    else if (mod === 'public-author') router.push('/author/me');
+    else {
       router.push(`/${mod}`);
     }
   };
@@ -56,7 +53,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           onOpenQuickCreate={() => setQuickCreateOpen(true)}
           onOpenNotifications={() => setNotificationsOpen(true)}
           onOpenAiAssistant={() => setAiAssistantOpen(true)}
-          unreadNotificationsCount={INITIAL_NOTIFICATIONS.filter((n) => !n.read).length}
+          unreadNotificationsCount={0}
         />
 
         {/* Scrollable Viewport */}

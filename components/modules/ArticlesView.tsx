@@ -127,7 +127,7 @@ export function ArticlesView({ articles: initialArticles, onOpenPublicArticle }:
       publishedDate: new Date().toISOString().split('T')[0],
       readTime: '6 min read',
       views: 0,
-      coverImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop&q=60',
+      coverImage: '',
       contentMarkdown: `# ${newTitle}\n\n## Abstract\n${newSubtitle}\n\n## System Architecture\nDetail the core system invariants and scaling trade-offs here.`,
       toc: [
         { id: 'abstract', title: 'Abstract' },
@@ -138,7 +138,7 @@ export function ArticlesView({ articles: initialArticles, onOpenPublicArticle }:
         metaDescription: newSubtitle || newTitle,
         canonicalUrl: `https://signalforge.dev/articles/${slug}`,
         keywords: ['Distributed Systems', 'Architecture'],
-        ogImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop&q=60',
+        ogImage: '',
       },
     };
     setArticles([created, ...articles]);

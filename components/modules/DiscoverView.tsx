@@ -37,7 +37,7 @@ export function DiscoverView({ signals: initialSignals, onSelectTopic, onDraftCo
   const [signals, setSignals] = useState<TopicSignal[]>(initialSignals);
   const [activeTab, setActiveTab] = useState<'All' | 'Trending' | 'AI & Inference' | 'Distributed Systems' | 'Database Engines' | 'Saved'>('All');
   const [selectedTopicDetail, setSelectedTopicDetail] = useState<TopicSignal | null>(null);
-  const [savedTopics, setSavedTopics] = useState<string[]>(['sig-1', 'sig-2']);
+  const [savedTopics, setSavedTopics] = useState<string[]>([]);
 
   // Modals for CRUD
   const [addSignalModalOpen, setAddSignalModalOpen] = useState(false);
@@ -55,15 +55,15 @@ export function DiscoverView({ signals: initialSignals, onSelectTopic, onDraftCo
     title: '',
     category: 'AI & Inference',
     summary: '',
-    source: 'ArXiv & Tech Radar',
-    trendScore: 92,
-    freshness: 'Just now',
-    careerRelevance: 'Staff Systems Engineer / ML Architect',
-    companyRelevance: ['Google', 'Meta', 'Anthropic'],
-    tags: ['Distributed Systems'],
-    keyFacts: ['Decoupled architectural throughput scaling in production.'],
-    timeline: [{ year: '2026', milestone: 'Initial breakthrough reported' }],
-    suggestedAngles: ['Architectural trade-off deep dive for production systems'],
+    source: '',
+    trendScore: 0,
+    freshness: '',
+    careerRelevance: '',
+    companyRelevance: [],
+    tags: [],
+    keyFacts: [],
+    timeline: [],
+    suggestedAngles: [],
   });
 
   const toggleSave = (id: string, e: React.MouseEvent) => {
@@ -115,7 +115,7 @@ export function DiscoverView({ signals: initialSignals, onSelectTopic, onDraftCo
         trendScore: newSignal.trendScore || 90,
         freshness: 'Just added',
         careerRelevance: newSignal.careerRelevance || 'Staff Systems Engineer',
-        companyRelevance: newSignal.companyRelevance || ['Google', 'Meta'],
+        companyRelevance: newSignal.companyRelevance || [],
         tags: newSignal.tags || ['Systems'],
         keyFacts: newSignal.keyFacts || ['Production deployment verified.'],
         timeline: newSignal.timeline || [{ year: '2026', milestone: 'Signal identified' }],
@@ -127,15 +127,15 @@ export function DiscoverView({ signals: initialSignals, onSelectTopic, onDraftCo
         title: '',
         category: 'AI & Inference',
         summary: '',
-        source: 'ArXiv & Tech Radar',
-        trendScore: 92,
-        freshness: 'Just now',
-        careerRelevance: 'Staff Systems Engineer / ML Architect',
-        companyRelevance: ['Google', 'Meta', 'Anthropic'],
-        tags: ['Distributed Systems'],
-        keyFacts: ['Decoupled architectural throughput scaling in production.'],
-        timeline: [{ year: '2026', milestone: 'Initial breakthrough reported' }],
-        suggestedAngles: ['Architectural trade-off deep dive for production systems'],
+        source: '',
+        trendScore: 0,
+        freshness: '',
+        careerRelevance: '',
+        companyRelevance: [],
+        tags: [],
+        keyFacts: [],
+        timeline: [],
+        suggestedAngles: [],
       });
       setCurrentPage(1);
     } finally {

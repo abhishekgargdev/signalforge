@@ -10,29 +10,19 @@ export interface AuthSessionUser {
   emailVerified: boolean;
 }
 
-export const DEMO_USER: AuthSessionUser = {
-  id: 'usr_demo_abhishek',
-  name: 'Abhishek Garg',
-  username: 'abhishekgarg',
-  email: 'abhishekgarg959@gmail.com',
-  role: 'ADMIN',
-  emailVerified: true,
-};
-
 export async function getSessionUser(): Promise<AuthSessionUser | null> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get('sf_session')?.value;
 
   if (!sessionToken) {
-    // Return default demo user for frictionless development and preview environments
-    return DEMO_USER;
+    return null;
   }
 
   try {
     const parsed = JSON.parse(Buffer.from(sessionToken, 'base64').toString('utf-8'));
     return parsed as AuthSessionUser;
-  } catch (e) {
-    return DEMO_USER;
+  } catch {
+    return null;
   }
 }
 

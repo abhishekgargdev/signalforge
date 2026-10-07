@@ -65,8 +65,14 @@ export function DashboardView({
             Engineering Command Dashboard
           </h1>
           <p className="text-xs text-zinc-400 mt-1 max-w-2xl leading-relaxed">
-            Positioning target profile for <strong className="text-emerald-300 font-semibold">{career.targetRole}</strong> across{' '}
-            {companies.length} tracked infrastructure leaders.
+            {career.targetRole ? (
+              <>
+                Positioning for <strong className="text-emerald-300 font-semibold">{career.targetRole}</strong> across{' '}
+                {companies.length} tracked {companies.length === 1 ? 'company' : 'companies'}.
+              </>
+            ) : (
+              <>Add career targets and companies to personalize this dashboard.</>
+            )}
           </p>
         </div>
 
@@ -105,7 +111,7 @@ export function DashboardView({
                   </span>
                 </h3>
                 <p className="text-[11px] text-zinc-400 font-mono">
-                  Daily Cron: 09:00 UTC • 15 Invites/day Quota
+                  Configure daily invite limits in Prospector
                 </p>
               </div>
             </div>
@@ -120,12 +126,12 @@ export function DashboardView({
           </div>
 
           <p className="text-xs text-zinc-300 leading-snug">
-            Express thoughts in natural language; AI auto-populates criteria for FAANG engineers, crafts personalized 300-char notes, and connects directly or via scheduled daily cron.
+            Describe who you want to reach in natural language; AI helps fill criteria and draft short connection notes.
           </p>
 
           <div className="flex items-center justify-between pt-1 text-[11px] font-mono text-zinc-400 border-t border-white/5">
-            <span>Queued: <strong className="text-emerald-400">6 FAANG Leads</strong></span>
-            <span>Accepted Rate: <strong className="text-[#22c55e]">45%</strong></span>
+            <span>Queued: <strong className="text-emerald-400">—</strong></span>
+            <span>Accepted rate: <strong className="text-[#22c55e]">—</strong></span>
           </div>
         </div>
 
@@ -144,7 +150,7 @@ export function DashboardView({
                   </span>
                 </h3>
                 <p className="text-[11px] text-zinc-400 font-mono">
-                  Cadence: Every 4 Hours • 99% Originality
+                  Set comment cadence in Comment Studio
                 </p>
               </div>
             </div>
@@ -159,12 +165,12 @@ export function DashboardView({
           </div>
 
           <p className="text-xs text-zinc-300 leading-snug">
-            Monitors posts from leaders at Google, Meta, Apple & Netflix. AI drafts high-signal architectural commentary on cron and prepares active chat / InMail pitches to drive interview inquiries.
+            Track posts from target leaders, draft comments with AI, and prepare follow-up messages when you are ready.
           </p>
 
           <div className="flex items-center justify-between pt-1 text-[11px] font-mono text-zinc-400 border-t border-white/5">
-            <span>Profile Views: <strong className="text-emerald-400">+412 FAANG Views</strong></span>
-            <span>Recruiter Inbounds: <strong className="text-[#f59e0b]">9 Active</strong></span>
+            <span>Profile views: <strong className="text-emerald-400">—</strong></span>
+            <span>Inbounds: <strong className="text-[#f59e0b]">—</strong></span>
           </div>
         </div>
       </div>
@@ -175,7 +181,7 @@ export function DashboardView({
           {
             label: 'High-Relevance Signals',
             value: `${signals.length} Active`,
-            delta: '+3 new today',
+            delta: signals.length ? 'From your radar' : 'Add signals in Discover',
             icon: Zap,
             color: '#22c55e',
             target: 'discover',
@@ -183,7 +189,7 @@ export function DashboardView({
           {
             label: 'Monitored Tech Leaders',
             value: `${companies.length} Companies`,
-            delta: 'Anthropic, Stripe, Datadog',
+            delta: companies.length ? 'In your CRM' : 'Add companies',
             icon: Building2,
             color: '#f59e0b',
             target: 'companies',
@@ -191,15 +197,15 @@ export function DashboardView({
           {
             label: 'Engagement Queue',
             value: `${engagements.filter((e) => e.status === 'pending').length} Actionable`,
-            delta: 'Avg 97% originality',
+            delta: engagements.length ? 'Review queue' : 'No items queued',
             icon: MessageSquareQuote,
             color: '#10b981',
             target: 'engagement',
           },
           {
-            label: '30-Day Technical Reach',
-            value: '48.9k Views',
-            delta: '+24.6% impressions',
+            label: 'Published articles',
+            value: `${articles.filter((a) => a.status === 'published').length}`,
+            delta: articles.length ? 'In your library' : 'Create in Articles',
             icon: TrendingUp,
             color: '#38bdf8',
             target: 'analytics',
@@ -248,6 +254,11 @@ export function DashboardView({
           </div>
 
           <div className="space-y-3">
+            {signals.length === 0 && (
+              <div className="p-8 rounded-xl bg-[#0e1710] border border-white/5 text-center text-xs text-zinc-500 font-mono">
+                No signals yet. Open Discover to add or import topics.
+              </div>
+            )}
             {signals.map((sig) => (
               <div
                 key={sig.id}
@@ -317,54 +328,46 @@ export function DashboardView({
                 <Target className="w-3.5 h-3.5 text-[#22c55e]" />
                 Action Items (Today)
               </h3>
-              <span className="text-[10px] font-mono text-zinc-500">3 Pending</span>
+              <span className="text-[10px] font-mono text-zinc-500">
+                {engagements.filter((e) => e.status === 'pending').length} pending
+              </span>
             </div>
 
             <div className="space-y-2.5 text-xs">
-              <div
-                onClick={() => onNavigate('engagement')}
-                className="p-3 rounded-lg bg-black/40 border border-emerald-500/20 hover:border-emerald-500/40 cursor-pointer transition space-y-1"
-              >
-                <div className="font-semibold text-slate-200">
-                  Review LinkedIn Comment for Sarah Chen (Anthropic)
-                </div>
-                <div className="text-[11px] text-zinc-400">
-                  Topic: Speculative decoding draft model acceptance rates
-                </div>
-                <span className="inline-block text-[10px] font-mono text-emerald-400">
-                  Ready for review →
-                </span>
-              </div>
-
-              <div
-                onClick={() => onNavigate('content')}
-                className="p-3 rounded-lg bg-black/40 border border-white/5 hover:border-[#22c55e]/30 cursor-pointer transition space-y-1"
-              >
-                <div className="font-semibold text-slate-200">
-                  Publish Scheduled Article: &ldquo;Speculative Decoding in Production&rdquo;
-                </div>
-                <div className="text-[11px] text-zinc-400">
-                  Approved draft waiting for automated push
-                </div>
-                <span className="inline-block text-[10px] font-mono text-[#f59e0b]">
-                  Scheduled for 14:00 UTC →
-                </span>
-              </div>
-
-              <div
-                onClick={() => onNavigate('knowledge')}
-                className="p-3 rounded-lg bg-black/40 border border-white/5 hover:border-[#22c55e]/30 cursor-pointer transition space-y-1"
-              >
-                <div className="font-semibold text-slate-200">
-                  Log STAR Story: Kafka KRaft Zero-Downtime Migration
-                </div>
-                <div className="text-[11px] text-zinc-400">
-                  Grounds next week&apos;s infrastructure thread in real results
-                </div>
-                <span className="inline-block text-[10px] font-mono text-cyan-400">
-                  Vault entry pending →
-                </span>
-              </div>
+              {engagements.filter((e) => e.status === 'pending').length === 0 &&
+                pipeline.filter((p) => ['draft', 'review', 'approved', 'scheduled'].includes(p.status)).length === 0 && (
+                  <p className="p-4 rounded-lg bg-black/40 border border-white/5 text-zinc-500 font-mono text-[11px] text-center">
+                    No action items. Add engagement opportunities or content drafts to see tasks here.
+                  </p>
+                )}
+              {engagements
+                .filter((e) => e.status === 'pending')
+                .slice(0, 2)
+                .map((e) => (
+                  <button
+                    type="button"
+                    key={e.id}
+                    onClick={() => onNavigate('engagement')}
+                    className="w-full text-left p-3 rounded-lg bg-black/40 border border-emerald-500/20 hover:border-emerald-500/40 transition space-y-1"
+                  >
+                    <div className="font-semibold text-slate-200">Review comment for {e.author}</div>
+                    <div className="text-[11px] text-zinc-400 line-clamp-2">{e.content}</div>
+                  </button>
+                ))}
+              {pipeline
+                .filter((p) => ['review', 'approved', 'scheduled'].includes(p.status))
+                .slice(0, 2)
+                .map((item) => (
+                  <button
+                    type="button"
+                    key={item.id}
+                    onClick={() => onNavigate('content')}
+                    className="w-full text-left p-3 rounded-lg bg-black/40 border border-white/5 hover:border-[#22c55e]/30 transition space-y-1"
+                  >
+                    <div className="font-semibold text-slate-200">{item.title}</div>
+                    <div className="text-[11px] text-zinc-400 capitalize">{item.status}</div>
+                  </button>
+                ))}
             </div>
           </div>
 
@@ -384,6 +387,9 @@ export function DashboardView({
             </div>
 
             <div className="space-y-2">
+              {pipeline.length === 0 && (
+                <p className="text-[11px] text-zinc-500 font-mono p-2 text-center">Pipeline empty</p>
+              )}
               {pipeline.slice(0, 3).map((item) => (
                 <div
                   key={item.id}

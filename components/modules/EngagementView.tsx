@@ -54,11 +54,9 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
 
   // Monitored posts state
   const [monitoredPosts, setMonitoredPosts] = useState<FaangMonitoredPost[]>(INITIAL_FAANG_MONITORED_POSTS);
-  const [selectedPost, setSelectedPost] = useState<FaangMonitoredPost>(INITIAL_FAANG_MONITORED_POSTS[0]);
+  const [selectedPost, setSelectedPost] = useState<FaangMonitoredPost | null>(null);
   const [selectedCommentIndex, setSelectedCommentIndex] = useState<number>(0);
-  const [editedComment, setEditedComment] = useState<string>(
-    INITIAL_FAANG_MONITORED_POSTS[0]?.aiSuggestedComments[0]?.commentText || ''
-  );
+  const [editedComment, setEditedComment] = useState<string>('');
   const [copiedComment, setCopiedComment] = useState<boolean>(false);
   const [postedSuccess, setPostedSuccess] = useState<string | null>(null);
 
@@ -117,6 +115,7 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
 
   // Handle comment angle tab
   const handleSelectCommentAngle = (idx: number) => {
+    if (!selectedPost) return;
     setSelectedCommentIndex(idx);
     setEditedComment(selectedPost.aiSuggestedComments[idx]?.commentText || '');
   };
@@ -133,7 +132,11 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
     setMonitoredPosts((prev) =>
       prev.map((p) => (p.id === postId ? { ...p, status: 'approved' } : p))
     );
-    setPostedSuccess(`Comment successfully published on ${selectedPost.authorName}'s LinkedIn post!`);
+    setPostedSuccess(
+      selectedPost
+        ? `Comment marked ready for ${selectedPost.authorName}'s post.`
+        : 'Comment saved.'
+    );
     setTimeout(() => setPostedSuccess(null), 3000);
   };
 
@@ -145,8 +148,12 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
       await new Promise((r) => setTimeout(r, 500));
       const remaining = monitoredPosts.filter((p) => p.id !== postToDelete.id);
       setMonitoredPosts(remaining);
-      if (selectedPost.id === postToDelete.id && remaining.length > 0) {
-        handleSelectPost(remaining[0]);
+      if (selectedPost?.id === postToDelete.id) {
+        if (remaining.length > 0) handleSelectPost(remaining[0]);
+        else {
+          setSelectedPost(null);
+          setEditedComment('');
+        }
       }
       setPostToDelete(null);
     } catch (err) {
@@ -165,7 +172,7 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
       setMonitoredPosts((prev) =>
         prev.map((p) => (p.id === editingPost.id ? editingPost : p))
       );
-      if (selectedPost.id === editingPost.id) {
+      if (selectedPost?.id === editingPost.id) {
         setSelectedPost(editingPost);
         setEditedComment(editingPost.aiSuggestedComments[selectedCommentIndex]?.commentText || '');
       }
@@ -268,7 +275,7 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
           authorRole: customRole || 'Systems Architect',
           company: customCompany,
           companyBadge: 'FAANG',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128&fit=crop&crop=face',
+          avatar: '',
           postTimestamp: 'Just analyzed',
           platform: 'LinkedIn',
           originalPostText: customPostText,
@@ -465,7 +472,7 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
                 </div>
               ) : (
                 paginatedPosts.map((post) => {
-                  const isSelected = selectedPost.id === post.id;
+                  const isSelected = selectedPost?.id === post.id;
                   const isApproved = post.status === 'approved';
 
                   return (
@@ -563,9 +570,13 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
               />
             </div>
 
-            {/* Right 2 Columns: Deep Architectural Analysis, 4 Comment Angles & Active Pitch */}
             <div className="lg:col-span-2 space-y-5">
-              {/* Target Post Detail Box */}
+              {!selectedPost ? (
+                <div className="p-12 rounded-xl bg-[#0e1710] border border-white/5 text-center text-xs text-zinc-500 font-mono">
+                  Select a monitored post or use &quot;Analyze & Comment on Any Post&quot; to get started.
+                </div>
+              ) : (
+              <>
               <div className="p-4 rounded-xl bg-[#0e1710] border border-[#22c55e]/25 space-y-3">
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
                   <div className="flex items-center gap-2">
@@ -719,6 +730,8 @@ export function EngagementView({ opportunities, people }: EngagementViewProps) {
                   </div>
                 </div>
               </div>
+              </>
+              )}
             </div>
           </div>
         </div>

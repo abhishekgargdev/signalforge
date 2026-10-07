@@ -19,43 +19,15 @@ export function MediaView() {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
   // Cloudinary media assets
-  const [assets, setAssets] = useState([
-    {
-      id: 'med-1',
-      title: 'Speculative Decoding Inference Architecture',
-      format: 'PNG',
-      dimensions: '1200x630',
-      size: '240 KB',
-      folder: 'Article Covers',
-      url: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=630&fit=crop',
-    },
-    {
-      id: 'med-2',
-      title: 'Kafka KRaft Ring Buffer Observability',
-      format: 'PNG',
-      dimensions: '1080x1080',
-      size: '310 KB',
-      folder: 'Social Slides',
-      url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&h=630&fit=crop',
-    },
-    {
-      id: 'med-3',
-      title: 'Postgres Tiered WAL Page Server Blueprint',
-      format: 'WEBP',
-      dimensions: '1920x1080',
-      size: '180 KB',
-      folder: 'Infographics',
-      url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop',
-    },
-  ]);
+  const [assets, setAssets] = useState<
+    { id: string; title: string; format: string; dimensions: string; size: string; folder: string; url: string }[]
+  >([]);
 
   // Image prompt generator state
-  const [promptTopic, setPromptTopic] = useState('Speculative decoding memory-bandwidth throughput in GPU clusters');
+  const [promptTopic, setPromptTopic] = useState('');
   const [visualStyle, setVisualStyle] = useState('Cyber Technical Diagram');
   const [aspectRatio, setAspectRatio] = useState('16:9');
-  const [generatedPrompt, setGeneratedPrompt] = useState(
-    'Isometric technical architecture diagram of a high-throughput GPU cluster, glowing green memory bus traces representing speculative draft model validation, dark carbon background, clean architectural wireframe lines, ultra-sharp vector details.'
-  );
+  const [generatedPrompt, setGeneratedPrompt] = useState('');
 
   const handleCopyUrl = (url: string) => {
     navigator.clipboard?.writeText(url);
@@ -114,8 +86,12 @@ export function MediaView() {
             </p>
           </div>
 
-          {/* Asset Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {assets.length === 0 && (
+              <div className="col-span-full p-10 rounded-xl border border-white/5 bg-[#0e1710] text-center text-xs text-zinc-500 font-mono">
+                No media assets yet. Upload files to populate your library.
+              </div>
+            )}
             {assets.map((asset) => (
               <div
                 key={asset.id}

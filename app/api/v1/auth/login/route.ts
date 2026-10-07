@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { LoginSchema } from '@/validators/auth';
-import { standardResponse, standardError, DEMO_USER, createSessionCookie } from '@/lib/auth';
+import { standardResponse, standardError, createSessionCookie, type AuthSessionUser } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
 export async function POST(req: NextRequest) {
@@ -14,10 +14,14 @@ export async function POST(req: NextRequest) {
 
     const { email, password } = result.data;
 
-    // Authenticate demo user or registered user
-    const user = {
-      ...DEMO_USER,
+    const localPart = email.split('@')[0] || 'user';
+    const user: AuthSessionUser = {
+      id: `usr_${Date.now()}`,
+      name: localPart,
+      username: localPart.replace(/\W/g, '').slice(0, 24) || 'user',
       email,
+      role: 'USER',
+      emailVerified: false,
     };
 
     const cookieVal = createSessionCookie(user);

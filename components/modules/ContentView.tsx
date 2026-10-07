@@ -54,41 +54,24 @@ export function ContentView({
   const [wizardData, setWizardData] = useState({
     sourceType: 'trending-topic',
     selectedSourceId: signals[0]?.id || '',
-    researchNotes: 'Speculative decoding decouples memory bandwidth from compute, accelerating autoregressive inference up to 3.8x with entropy thresholds.',
-    contentAngle: 'Architectural breakdown: Tree-verification vs linear draft pipelines under heavy concurrency',
+    researchNotes: '',
+    contentAngle: '',
     platform: 'LinkedIn' as 'LinkedIn' | 'X' | 'Web',
-    hookText: 'Most engineering leads think speculative decoding is a free lunch. But if your draft model has less than 70% acceptance rate on code generation, validation thrashing will actually degrade your p95 latency.',
-    bodyText: 'Here is the architectural math behind why draft model entropy gating is mandatory for production LLM clusters in 2026:\n\n1. Memory Bandwidth Wall: Token generation is bounded by HBM3e weight loading, not arithmetic.\n2. Single Forward Pass: Verifying K draft tokens uses the exact same memory load pass as generating 1 token.\n3. Dynamic Gating: Measuring Shannon entropy H(X) prevents rollback penalties on difficult branches.\n\nWhat tradeoffs has your team observed when tuning speculative depth?',
-    ctaText: 'Follow for weekly distributed systems breakdowns.',
-    hashtags: ['#LLMInference', '#DistributedSystems', '#vLLM', '#MachineLearning'],
-    scheduledDate: '2026-09-30 09:00',
-    mediaType: 'Infographic Architecture Diagram',
+    hookText: '',
+    bodyText: '',
+    ctaText: '',
+    hashtags: [] as string[],
+    scheduledDate: '',
+    mediaType: '',
   });
 
   const [aiGenerating, setAiGenerating] = useState(false);
   const [copiedPreview, setCopiedPreview] = useState(false);
 
   // Carousel builder state
-  const [carouselSlides, setCarouselSlides] = useState([
-    {
-      id: '1',
-      title: 'Speculative Decoding in 2026',
-      subtitle: 'Why Memory Bandwidth Dominates LLM Inference',
-      codeSnippet: `// Standard Autoregressive Sampling\nfor token in tokens {\n  load_weights_from_HBM(140GB);\n  run_attention_kernel(1_token);\n}`,
-    },
-    {
-      id: '2',
-      title: 'The Draft Model Verification Theorem',
-      subtitle: 'Verifying K tokens in a single batch pass',
-      codeSnippet: `// Speculative Verification\ndraft_tokens = draft_model.predict(K=4);\ntarget_model.verify_batch(draft_tokens); // 1 single memory pass!`,
-    },
-    {
-      id: '3',
-      title: 'Entropy-Guided Thresholding',
-      subtitle: 'Preventing Rollback Cascades',
-      codeSnippet: `if shannon_entropy(logits) > 1.4 {\n  speculate_depth = 1; // Fall back to safe step\n}`,
-    },
-  ]);
+  const [carouselSlides, setCarouselSlides] = useState<
+    { id: string; title: string; subtitle: string; codeSnippet: string }[]
+  >([]);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   const handleNextStep = () => setWizardStep((prev) => Math.min(prev + 1, 10));
@@ -629,7 +612,11 @@ export function ContentView({
               ))}
             </div>
 
-            {/* Slide Canvas Preview */}
+            {carouselSlides.length === 0 ? (
+              <div className="lg:col-span-2 p-10 rounded-xl bg-[#0e1710] border border-white/5 text-center text-xs text-zinc-500 font-mono">
+                No carousel slides yet. Add slides to build a LinkedIn carousel.
+              </div>
+            ) : (
             <div className="lg:col-span-2 p-6 rounded-xl bg-black/80 border border-[#22c55e]/40 shadow-2xl flex flex-col justify-between aspect-square max-h-[460px]">
               <div>
                 <div className="flex items-center justify-between text-zinc-500 font-mono text-xs mb-4">
@@ -650,10 +637,10 @@ export function ContentView({
               </div>
 
               <div className="flex items-center justify-between pt-4 border-t border-zinc-900 text-[11px] font-mono text-zinc-500">
-                <span>Swipe left for next invariant →</span>
-                <span>By Abhishek Garg</span>
+                <span>Swipe for next slide →</span>
               </div>
             </div>
+            )}
           </div>
         </div>
       )}

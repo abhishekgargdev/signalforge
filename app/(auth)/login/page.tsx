@@ -7,7 +7,7 @@ import { Eye, EyeOff, Lock, Mail, ArrowRight, RefreshCw, AlertCircle } from 'luc
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('abhishekgarg959@gmail.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('Password123');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);

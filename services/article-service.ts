@@ -21,7 +21,7 @@ export class ArticleService {
             publishedDate: a.publishedDate || 'Sept 2026',
             readTime: a.readTime,
             views: a.views,
-            coverImage: a.coverImage || 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=630&fit=crop',
+            coverImage: a.coverImage || '',
             contentMarkdown: a.contentMarkdown,
             toc: a.toc || [],
             seo: a.seo,
@@ -50,7 +50,7 @@ export class ArticleService {
       publishedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       readTime: data.readTime || '5 min read',
       views: 0,
-      coverImage: data.coverImage || 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=630&fit=crop',
+      coverImage: data.coverImage || '',
       contentMarkdown: data.contentMarkdown || '# New Article',
       toc: data.toc || [{ id: 'intro', title: '1. Introduction' }],
       seo: data.seo || {

@@ -78,8 +78,8 @@ export function KnowledgeView({
     problem: '',
     architecture: '',
     technologies: ['Go', 'eBPF'],
-    githubUrl: 'https://github.com/abhishekgarg/',
-    liveUrl: 'https://signalforge.dev/',
+    githubUrl: '',
+    liveUrl: '',
     lessons: '',
   });
 
@@ -173,8 +173,8 @@ export function KnowledgeView({
         problem: newProj.problem || 'Latency bottlenecks in distributed pipelines',
         architecture: newProj.architecture || 'Decoupled ring-buffer architecture',
         technologies: newProj.technologies || ['Go', 'eBPF'],
-        githubUrl: newProj.githubUrl || 'https://github.com/abhishekgarg/',
-        liveUrl: newProj.liveUrl || 'https://signalforge.dev/',
+        githubUrl: newProj.githubUrl || '',
+        liveUrl: newProj.liveUrl || '',
         lessons: newProj.lessons || 'Zero-copy memory management in critical paths',
       };
       setProjects([created, ...projects]);
@@ -426,24 +426,28 @@ export function KnowledgeView({
 
                 <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs font-mono">
                   <div className="flex gap-2">
-                    <a
-                      href={p.githubUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-zinc-400 hover:text-white flex items-center gap-1 text-[11px]"
-                    >
-                      <Github className="w-3 h-3" />
-                      <span>Code</span>
-                    </a>
-                    <a
-                      href={p.liveUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-emerald-400 hover:underline flex items-center gap-1 text-[11px]"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      <span>System Specs</span>
-                    </a>
+                    {p.githubUrl ? (
+                      <a
+                        href={p.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-zinc-400 hover:text-white flex items-center gap-1 text-[11px]"
+                      >
+                        <Github className="w-3 h-3" />
+                        <span>Code</span>
+                      </a>
+                    ) : null}
+                    {p.liveUrl ? (
+                      <a
+                        href={p.liveUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-emerald-400 hover:underline flex items-center gap-1 text-[11px]"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Live</span>
+                      </a>
+                    ) : null}
                   </div>
                   <span className="text-zinc-500 text-[10px]">{p.technologies.join(', ')}</span>
                 </div>

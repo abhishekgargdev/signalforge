@@ -36,7 +36,7 @@ export function CareerView({ career, onNavigateToContent }: CareerViewProps) {
         </div>
 
         <span className="text-xs font-mono text-emerald-400 bg-[#0e1710] px-3 py-1.5 rounded-lg border border-[#22c55e]/20">
-          Target Role: {career.targetRole}
+          Target role: {career.targetRole || 'Not set'}
         </span>
       </div>
 
@@ -55,11 +55,15 @@ export function CareerView({ career, onNavigateToContent }: CareerViewProps) {
             Target Companies
           </span>
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {career.targetCompanies.map((c) => (
-              <span key={c} className="text-xs font-mono px-2 py-0.5 rounded bg-black/50 text-emerald-300 border border-[#22c55e]/20">
-                {c}
-              </span>
-            ))}
+            {career.targetCompanies.length === 0 ? (
+              <span className="text-xs text-zinc-500">Add target companies in Settings or Companies.</span>
+            ) : (
+              career.targetCompanies.map((c) => (
+                <span key={c} className="text-xs font-mono px-2 py-0.5 rounded bg-black/50 text-emerald-300 border border-[#22c55e]/20">
+                  {c}
+                </span>
+              ))
+            )}
           </div>
         </div>
 
@@ -68,7 +72,7 @@ export function CareerView({ career, onNavigateToContent }: CareerViewProps) {
             Strategy Objective
           </span>
           <p className="text-xs text-zinc-300 leading-snug">
-            Establish authority in speculative decoding & eBPF observability before inbound recruiter outreach.
+            Define how you want to position your expertise for inbound outreach.
           </p>
         </div>
       </div>
@@ -80,12 +84,15 @@ export function CareerView({ career, onNavigateToContent }: CareerViewProps) {
             <TrendingUp className="w-4 h-4 text-[#22c55e]" />
             High-Velocity Skill Alignment Matrix
           </h3>
-          <span className="text-[10px] font-mono text-zinc-500">
-            Based on Staff JD analyses across Anthropic, OpenAI, Stripe
-          </span>
+          <span className="text-[10px] font-mono text-zinc-500">From your saved career profile</span>
         </div>
 
         <div className="space-y-3">
+          {career.risingSkills.length === 0 && (
+            <p className="text-xs text-zinc-500 font-mono p-4 text-center border border-white/5 rounded-lg">
+              No skill alignment data yet.
+            </p>
+          )}
           {career.risingSkills.map((sk, i) => (
             <div key={i} className="p-3.5 rounded-lg bg-black/40 border border-white/5 space-y-2">
               <div className="flex items-center justify-between text-xs">
@@ -124,6 +131,9 @@ export function CareerView({ career, onNavigateToContent }: CareerViewProps) {
             Target teams value transparency on emerging topics you are actively exploring:
           </p>
           <div className="space-y-2">
+            {career.skillGaps.length === 0 && (
+              <p className="text-xs text-zinc-500 font-mono">No exploration topics listed.</p>
+            )}
             {career.skillGaps.map((gap, i) => (
               <div key={i} className="p-3 rounded-lg bg-black/40 border border-white/5 text-xs text-slate-300">
                 • {gap}
@@ -142,6 +152,9 @@ export function CareerView({ career, onNavigateToContent }: CareerViewProps) {
             Publish these exact angles to close domain perception gaps:
           </p>
           <div className="space-y-2">
+            {career.recommendedAngles.length === 0 && (
+              <p className="text-xs text-zinc-500 font-mono">Add content angles as you define your strategy.</p>
+            )}
             {career.recommendedAngles.map((ang, i) => (
               <div
                 key={i}
