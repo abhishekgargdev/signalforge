@@ -8,6 +8,7 @@ export interface IArticle extends Document {
   category: string;
   status: 'DRAFT' | 'PUBLISHED' | 'SCHEDULED' | 'ARCHIVED';
   publishedDate?: string;
+  scheduledDate?: string;
   readTime: string;
   views: number;
   coverImage?: string;
@@ -31,6 +32,7 @@ const ArticleSchema = new Schema<IArticle>(
     category: { type: String, required: true },
     status: { type: String, enum: ['DRAFT', 'PUBLISHED', 'SCHEDULED', 'ARCHIVED'], default: 'DRAFT' },
     publishedDate: { type: String },
+    scheduledDate: { type: String },
     readTime: { type: String, default: '5 min read' },
     views: { type: Number, default: 0 },
     coverImage: { type: String },

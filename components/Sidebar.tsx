@@ -9,13 +9,13 @@ import {
   FileText,
   Image as ImageIcon,
   BrainCircuit,
-  Target,
   Settings,
   ChevronLeft,
   ChevronRight,
   UserPlus,
   CalendarDays,
-  Hash
+  Hash,
+  Flag
 } from 'lucide-react';
 import { BrandMark } from '@/components/BrandMark';
 
@@ -38,12 +38,12 @@ export function Sidebar({
     { id: 'articles', label: 'Technical Articles', icon: FileText },
     { id: 'topics', label: 'Topics', icon: Hash },
     { id: 'companies', label: 'Target Companies', icon: Building2 },
-    { id: 'occasions', label: 'Occasions', icon: CalendarDays },
+    { id: 'occasions', label: 'Occasions', icon: Flag },
+    { id: 'calendar', label: 'Calendar', icon: CalendarDays },
     { id: 'prospector', label: 'Connections', icon: UserPlus },
     { id: 'engagement', label: 'Comments', icon: MessageSquareQuote },
     { id: 'media', label: 'Media Library', icon: ImageIcon },
     { id: 'knowledge', label: 'Experience Vault', icon: BrainCircuit },
-    { id: 'career', label: 'Career Signals', icon: Target },
   ];
 
   return (

@@ -36,7 +36,7 @@ export function CommandPalette({ isOpen, onClose, onNavigate }: CommandPalettePr
     { mod: 'articles', label: 'Technical Articles', keywords: ['article', 'publish', 'essay'] },
     { mod: 'prospector', label: 'Connections', keywords: ['linkedin', 'connect', 'invite'] },
     { mod: 'engagement', label: 'Comments', keywords: ['comment', 'reply'] },
-    { mod: 'career', label: 'Career Signals', keywords: ['career', 'role', 'skill'] },
+    { mod: 'calendar', label: 'Calendar', keywords: ['calendar', 'schedule', 'date'] },
     { mod: 'settings', label: 'Settings', keywords: ['settings', 'profile', 'integration'] },
   ].filter(
     (item) =>

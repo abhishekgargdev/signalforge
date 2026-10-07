@@ -97,7 +97,9 @@ export function Header({
       case 'knowledge':
         return 'Experience Vault';
       case 'career':
-        return 'Career Signals';
+        return 'Calendar';
+      case 'calendar':
+        return 'Post and article calendar';
       case 'analytics':
         return 'Dashboard';
       case 'ai':

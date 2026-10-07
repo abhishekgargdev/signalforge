@@ -10,6 +10,17 @@ import { connectToDatabase, isDbConnected } from '@/lib/db/mongoose';
 import { Profile } from '@/models/Profile';
 import { User } from '@/models/User';
 
+export async function GET() {
+  const current = await getSessionUser();
+  if (!current) return standardError('UNAUTHORIZED', 'Sign in required', 401);
+  await connectToDatabase();
+  if (!isDbConnected() || !mongoose.Types.ObjectId.isValid(current.id)) {
+    return standardResponse({ generationPrompt: '' });
+  }
+  const profile = await Profile.findOne({ userId: current.id }).lean();
+  return standardResponse({ generationPrompt: profile?.generationPrompt || '' });
+}
+
 export async function PATCH(req: Request) {
   const current = await getSessionUser();
   if (!current) {
@@ -20,6 +31,7 @@ export async function PATCH(req: Request) {
   const name = typeof body.name === 'string' ? body.name.trim() : current.name;
   const headline = typeof body.headline === 'string' ? body.headline.trim() : current.headline || '';
   const bio = typeof body.bio === 'string' ? body.bio.trim() : current.bio || '';
+  const generationPrompt = typeof body.generationPrompt === 'string' ? body.generationPrompt.trim() : '';
 
   if (!name) {
     return standardError('VALIDATION_ERROR', 'Full name is required', 400);
@@ -31,7 +43,7 @@ export async function PATCH(req: Request) {
     await User.updateOne({ _id: current.id }, { name });
     await Profile.findOneAndUpdate(
       { userId: current.id },
-      { userId: current.id, headline, bio },
+      { userId: current.id, headline, bio, generationPrompt },
       { upsert: true }
     );
   }

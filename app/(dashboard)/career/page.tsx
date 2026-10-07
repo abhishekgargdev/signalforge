@@ -1,7 +1,5 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { CareerView } from '@/components/modules/CareerView';
-
-export default function CareerDashboardPage() {
-  return <CareerView />;
+export default function CareerRedirectPage() {
+  redirect('/calendar');
 }

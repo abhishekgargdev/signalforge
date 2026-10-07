@@ -9,6 +9,7 @@ export interface IProfile extends Document {
   targetRoles: string[];
   targetIndustries: string[];
   writingStyle: string;
+  generationPrompt?: string;
   githubUrl?: string;
   linkedinUrl?: string;
   xUrl?: string;
@@ -24,6 +25,7 @@ const ProfileSchema = new Schema<IProfile>(
     targetRoles: [{ type: String }],
     targetIndustries: [{ type: String }],
     writingStyle: { type: String, default: 'Direct, technical, zero-slop' },
+    generationPrompt: { type: String, default: '' },
     githubUrl: { type: String },
     linkedinUrl: { type: String },
     xUrl: { type: String },

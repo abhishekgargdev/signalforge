@@ -25,6 +25,7 @@ export function SettingsView() {
   const [email, setEmail] = useState('');
   const [headline, setHeadline] = useState('');
   const [bio, setBio] = useState('');
+  const [generationPrompt, setGenerationPrompt] = useState('');
   const [connected, setConnected] = useState<Record<string, { displayName: string }>>({});
 
   useEffect(() => {
@@ -39,6 +40,11 @@ export function SettingsView() {
         setEmail(user.email || '');
         setHeadline(user.headline || '');
         setBio(user.bio || '');
+      })
+    fetch('/api/v1/auth/profile')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && data.success) setGenerationPrompt(data.data.generationPrompt || '');
       })
     fetch('/api/accounts')
       .then((res) => res.json())
@@ -65,7 +71,7 @@ export function SettingsView() {
       const res = await fetch('/api/v1/auth/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, headline, bio }),
+        body: JSON.stringify({ name, headline, bio, generationPrompt }),
       });
       const data = await res.json();
       if (!data.success) {
@@ -192,6 +198,17 @@ export function SettingsView() {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="Short technical bio for your public profile"
+                className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none placeholder-zinc-600"
+              />
+            </div>
+
+            <div>
+              <label className="font-mono text-zinc-400 block mb-1">AI prompt</label>
+              <textarea
+                rows={4}
+                value={generationPrompt}
+                onChange={(e) => setGenerationPrompt(e.target.value)}
+                placeholder="How drafts should sound. Leave blank to use the default."
                 className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none placeholder-zinc-600"
               />
             </div>

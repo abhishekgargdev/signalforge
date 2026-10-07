@@ -20,6 +20,7 @@ const PRIVATE_PREFIXES = [
   '/topics',
   '/research',
   '/occasions',
+  '/calendar',
 ];
 
 function isPrivatePath(pathname: string) {
