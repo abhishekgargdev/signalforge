@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { IdeaBox } from '@/components/IdeaBox';
 import { Pagination } from '@/components/ui/Pagination';
+import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal';
 
 type Field = { key: string; label: string; multiline?: boolean };
 type Row = { id: string } & Record<string, string>;
@@ -30,6 +31,8 @@ export function SimpleListView({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  const [pendingDelete, setPendingDelete] = useState<Row | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const pageSize = 6;
 
   const load = () => {
@@ -62,14 +65,22 @@ export function SimpleListView({
     load();
   };
 
-  const remove = async (id: string) => {
-    const res = await fetch(`${endpoint}?id=${id}`, { method: 'DELETE' });
-    const data = await res.json();
-    if (!data.success) {
-      setError(data.error?.message || 'Could not delete');
-      return;
+  const remove = async () => {
+    if (!pendingDelete) return;
+    setIsDeleting(true);
+    setError(null);
+    try {
+      const res = await fetch(`${endpoint}?id=${pendingDelete.id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error?.message || 'Could not delete');
+        return;
+      }
+      setPendingDelete(null);
+      load();
+    } finally {
+      setIsDeleting(false);
     }
-    load();
   };
 
   const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
@@ -145,7 +156,7 @@ export function SimpleListView({
               >
                 Edit
               </button>
-              <button type="button" className="text-red-300" onClick={() => remove(row.id)}>
+              <button type="button" className="text-red-300" onClick={() => setPendingDelete(row)}>
                 Delete
               </button>
             </div>
@@ -153,6 +164,17 @@ export function SimpleListView({
         ))}
       </div>
       <Pagination currentPage={page} totalPages={pageCount} totalItems={rows.length} pageSize={pageSize} onPageChange={setPage} itemLabel={noun} />
+      <ConfirmDeleteModal
+        isOpen={Boolean(pendingDelete)}
+        onClose={() => {
+          if (!isDeleting) setPendingDelete(null);
+        }}
+        onConfirm={remove}
+        isDeleting={isDeleting}
+        title={`Delete this ${noun}`}
+        itemName={pendingDelete ? pendingDelete[fields[0].key] : undefined}
+        description={`This ${noun} will be removed. You can add it again later.`}
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { IdeaBox } from '@/components/IdeaBox';
 import { Pagination } from '@/components/ui/Pagination';
+import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal';
 
 type Skill = { name: string; matchPercent: number; demand: string };
 
@@ -18,6 +19,7 @@ export function CareerView() {
   const [skillPage, setSkillPage] = useState(1);
   const [anglePage, setAnglePage] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ kind: 'skill' | 'angle'; name: string } | null>(null);
 
   const load = () => {
     fetch('/api/v1/career')
@@ -100,15 +102,7 @@ export function CareerView() {
         {skills.slice((skillPage - 1) * 4, skillPage * 4).map((skill) => (
           <div key={skill.name} className="flex items-center justify-between text-xs">
             <span>{skill.name}</span>
-            <button
-              type="button"
-              className="text-red-300"
-              onClick={() => {
-                const next = skills.filter((item) => item.name !== skill.name);
-                setSkills(next);
-                save({ skills: next });
-              }}
-            >
+            <button type="button" className="text-red-300" onClick={() => setPendingDelete({ kind: 'skill', name: skill.name })}>
               Delete
             </button>
           </div>
@@ -137,21 +131,33 @@ export function CareerView() {
         {angles.slice((anglePage - 1) * 4, anglePage * 4).map((item) => (
           <div key={item} className="flex items-center justify-between text-xs">
             <span>{item}</span>
-            <button
-              type="button"
-              className="text-red-300"
-              onClick={() => {
-                const next = angles.filter((value) => value !== item);
-                setAngles(next);
-                save({ angles: next });
-              }}
-            >
+            <button type="button" className="text-red-300" onClick={() => setPendingDelete({ kind: 'angle', name: item })}>
               Delete
             </button>
           </div>
         ))}
         <Pagination currentPage={anglePage} totalPages={anglePages} totalItems={angles.length} pageSize={4} onPageChange={setAnglePage} itemLabel="angles" />
       </div>
+      <ConfirmDeleteModal
+        isOpen={Boolean(pendingDelete)}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={() => {
+          if (!pendingDelete) return;
+          if (pendingDelete.kind === 'skill') {
+            const next = skills.filter((item) => item.name !== pendingDelete.name);
+            setSkills(next);
+            save({ skills: next });
+          } else {
+            const next = angles.filter((value) => value !== pendingDelete.name);
+            setAngles(next);
+            save({ angles: next });
+          }
+          setPendingDelete(null);
+        }}
+        title={pendingDelete?.kind === 'angle' ? 'Delete this angle' : 'Delete this skill'}
+        itemName={pendingDelete?.name}
+        description="This entry will be removed from your career profile."
+      />
     </div>
   );
 }
