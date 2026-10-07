@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { PwaRegister } from '@/components/PwaRegister';
+import { AppLoaders } from '@/components/AppLoaders';
 
 const description =
   'AI-powered personal-brand, technology-intelligence, content-generation, company-engagement, and career-signal platform.';
@@ -48,7 +49,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     <html lang="en">
       <body suppressHydrationWarning>
         <PwaRegister />
-        {children}
+        <AppLoaders>{children}</AppLoaders>
       </body>
     </html>
   );

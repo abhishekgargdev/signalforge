@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { RefreshCw, Zap, Terminal } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+import { BrandMark } from '@/components/BrandMark';
 
 interface SkeletonCardProps {
   count?: number;
@@ -103,16 +104,50 @@ export function ApiSpinner({ label = 'Processing...' }: { label?: string }) {
   );
 }
 
-export function GlobalPageLoader({ message = 'Loading SignalForge Workspace...' }: { message?: string }) {
+export function TopProgress({ active }: { active: boolean }) {
+  if (!active) return null;
   return (
-    <div className="p-12 text-center space-y-4 font-mono animate-in fade-in">
-      <div className="w-12 h-12 rounded-xl bg-[#0e1710] border border-[#22c55e]/40 flex items-center justify-center mx-auto text-[#22c55e] shadow-lg shadow-[#22c55e]/15">
-        <Zap className="w-6 h-6 animate-pulse" />
-      </div>
-      <div className="text-xs text-emerald-400 font-semibold">{message}</div>
-      <div className="w-48 h-1 bg-zinc-800 rounded-full mx-auto overflow-hidden">
-        <div className="h-full bg-[#22c55e] animate-pulse w-3/4 rounded-full" />
+    <div className="fixed top-0 inset-x-0 z-[80] h-1 bg-emerald-950/80 overflow-hidden">
+      <div className="sf-bar h-full w-1/3 bg-[#22c55e]" />
+    </div>
+  );
+}
+
+export function PageLoader({ message = 'Loading SignalForge...' }: { message?: string }) {
+  return (
+    <div className="min-h-[50vh] flex items-center justify-center p-8 font-mono">
+      <div className="text-center space-y-3">
+        <div className="w-12 h-12 rounded-xl bg-[#0e1710] border border-[#22c55e]/40 flex items-center justify-center mx-auto shadow-lg shadow-[#22c55e]/15">
+          <BrandMark size={28} className="animate-pulse" />
+        </div>
+        <div className="text-xs text-emerald-400">{message}</div>
+        <div className="w-48 h-1 bg-zinc-800 rounded-full mx-auto overflow-hidden">
+          <div className="sf-bar h-full w-1/2 bg-[#22c55e]" />
+        </div>
       </div>
     </div>
   );
+}
+
+export function PageSkeleton() {
+  return (
+    <div className="space-y-6" aria-busy="true" aria-label="Loading page">
+      <div className="space-y-2 border-b border-[#22c55e]/20 pb-4">
+        <div className="h-6 w-64 bg-zinc-800/80 rounded animate-pulse" />
+        <div className="h-3 w-96 max-w-full bg-zinc-800/60 rounded animate-pulse" />
+      </div>
+      <div className="flex gap-2">
+        <div className="h-8 w-24 bg-zinc-800/80 rounded-lg animate-pulse" />
+        <div className="h-8 w-28 bg-zinc-800/60 rounded-lg animate-pulse" />
+        <div className="h-8 w-20 bg-zinc-800/60 rounded-lg animate-pulse" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <SkeletonCard count={4} />
+      </div>
+    </div>
+  );
+}
+
+export function GlobalPageLoader({ message = 'Loading SignalForge Workspace...' }: { message?: string }) {
+  return <PageLoader message={message} />;
 }
