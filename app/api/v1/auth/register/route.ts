@@ -42,12 +42,13 @@ export async function POST(req: NextRequest) {
       await sendEmail({
         to: email,
         subject: 'Verify your SignalForge email',
-        title: 'Confirm your email',
-        rows: [
-          { label: 'Name', value: name },
-          { label: 'Username', value: username },
-        ],
-        action: { href: `${origin}/verify-email?token=${verifyToken}`, label: 'Verify email' },
+        template: 'verify-email',
+        data: {
+          title: 'Confirm your email',
+          name,
+          username,
+          verifyUrl: `${origin}/verify-email?token=${verifyToken}`,
+        },
       });
     } catch (mailErr) {
       console.warn('Verification email was not sent', mailErr);

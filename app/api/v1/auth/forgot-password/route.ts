@@ -22,9 +22,12 @@ export async function POST(req: NextRequest) {
       await sendEmail({
         to: email,
         subject: 'Reset your SignalForge password',
-        title: 'Password reset',
-        rows: [{ label: 'Account', value: email }],
-        action: { href: `${origin}/reset-password?token=${token}`, label: 'Choose a new password' },
+        template: 'reset-password',
+        data: {
+          title: 'Password reset',
+          email,
+          resetUrl: `${origin}/reset-password?token=${token}`,
+        },
       });
     }
 

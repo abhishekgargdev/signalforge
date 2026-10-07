@@ -18,22 +18,15 @@ export async function POST(req: NextRequest) {
     await sendEmail({
       to: inbox,
       subject: `SignalForge contact from ${name}`,
-      title: 'New contact message',
-      rows: [
-        { label: 'Name', value: name },
-        { label: 'Email', value: email },
-        { label: 'Message', value: message.replace(/</g, '&lt;') },
-      ],
+      template: 'contact-inbox',
+      data: { title: 'New contact message', name, email, message },
     });
 
     await sendEmail({
       to: email,
       subject: 'We received your SignalForge message',
-      title: 'Message received',
-      rows: [
-        { label: 'Name', value: name },
-        { label: 'Summary', value: 'Your note is in the SignalForge inbox. We will reply to this address.' },
-      ],
+      template: 'contact-receipt',
+      data: { title: 'Message received', name, email, message },
     });
 
     return standardResponse({ sent: true });

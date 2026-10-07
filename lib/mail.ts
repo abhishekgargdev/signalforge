@@ -3,6 +3,8 @@ import path from 'path';
 import nodemailer from 'nodemailer';
 import ejs from 'ejs';
 
+export type EmailTemplate = 'contact-inbox' | 'contact-receipt' | 'verify-email' | 'reset-password';
+
 function transport() {
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
@@ -16,24 +18,21 @@ function transport() {
   });
 }
 
-export async function renderEmail(title: string, bodyHtml: string) {
-  const layoutPath = path.join(process.cwd(), 'emails', 'layout.ejs');
-  const layout = fs.readFileSync(layoutPath, 'utf8');
-  return ejs.render(layout, { title, body: bodyHtml });
+export async function renderTemplate(template: EmailTemplate, data: Record<string, string>) {
+  const dir = path.join(process.cwd(), 'emails');
+  const bodyPath = path.join(dir, `${template}.ejs`);
+  const layoutPath = path.join(dir, 'layout.ejs');
+  const body = ejs.render(fs.readFileSync(bodyPath, 'utf8'), data, { filename: bodyPath });
+  return ejs.render(fs.readFileSync(layoutPath, 'utf8'), { title: data.title, body }, { filename: layoutPath });
 }
 
-export async function sendEmail(options: { to: string; subject: string; title: string; rows: { label: string; value: string }[]; action?: { href: string; label: string } }) {
-  const rows = options.rows
-    .map(
-      (row) =>
-        `<tr><td style="padding:8px 0;color:#94a3b8;width:140px;vertical-align:top;">${row.label}</td><td style="padding:8px 0;color:#f8fafc;">${row.value}</td></tr>`
-    )
-    .join('');
-  const action = options.action
-    ? `<p style="margin:18px 0 0;"><a href="${options.action.href}" style="display:inline-block;background:#22c55e;color:#052e16;text-decoration:none;font-weight:700;padding:10px 16px;border-radius:8px;">${options.action.label}</a></p>`
-    : '';
-  const body = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table>${action}`;
-  const html = await renderEmail(options.title, body);
+export async function sendEmail(options: {
+  to: string;
+  subject: string;
+  template: EmailTemplate;
+  data: Record<string, string>;
+}) {
+  const html = await renderTemplate(options.template, options.data);
   const mailer = transport();
   if (!mailer) {
     throw new Error('SMTP is not configured');
