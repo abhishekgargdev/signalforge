@@ -8,6 +8,8 @@ export interface AuthSessionUser {
   email: string;
   role: 'USER' | 'ADMIN';
   emailVerified: boolean;
+  headline?: string;
+  bio?: string;
 }
 
 export async function getSessionUser(): Promise<AuthSessionUser | null> {

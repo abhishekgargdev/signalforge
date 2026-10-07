@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Settings,
   User,
@@ -15,8 +15,67 @@ import {
 } from 'lucide-react';
 import { INITIAL_AUDIT_LOGS } from '@/lib/signalforge-data';
 
+type SocialId = 'linkedin' | 'x';
+
 export function SettingsView() {
   const [activeTab, setActiveTab] = useState<'profile' | 'brand' | 'integrations' | 'audit'>('profile');
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [headline, setHeadline] = useState('');
+  const [bio, setBio] = useState('');
+  const [connectNotice, setConnectNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/v1/auth/session')
+      .then((res) => res.json())
+      .then((data) => {
+        const user = data?.data?.user;
+        if (cancelled || !user) return;
+        setName(user.name || '');
+        setUsername(user.username || '');
+        setEmail(user.email || '');
+        setHeadline(user.headline || '');
+        setBio(user.bio || '');
+      })
+      .finally(() => {
+        if (!cancelled) setProfileLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    setSaveMessage(null);
+    try {
+      const res = await fetch('/api/v1/auth/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, headline, bio }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setSaveMessage(data.error?.message || 'Could not save profile');
+        return;
+      }
+      setSaveMessage('Profile saved');
+    } catch {
+      setSaveMessage('Could not save profile');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const socialAccounts: { id: SocialId; name: string; desc: string }[] = [
+    { id: 'linkedin', name: 'LinkedIn', desc: 'Publish posts, comments, and connection notes from your account.' },
+    { id: 'x', name: 'X (Twitter)', desc: 'Schedule threads and posts from the social hub.' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -63,13 +122,38 @@ export function SettingsView() {
             <p className="text-zinc-400">Used by Forge AI to ensure realistic, grounded content synthesis.</p>
           </div>
 
+          {profileLoading ? (
+            <p className="text-xs text-zinc-500 font-mono">Loading your account…</p>
+          ) : (
           <div className="space-y-3">
             <div>
               <label className="font-mono text-zinc-400 block mb-1">Full Name:</label>
               <input
                 type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Your full name"
                 className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none placeholder-zinc-600"
+              />
+            </div>
+
+            <div>
+              <label className="font-mono text-zinc-400 block mb-1">Username:</label>
+              <input
+                type="text"
+                value={username}
+                readOnly
+                className="w-full p-2.5 rounded bg-black/40 border border-zinc-800 text-zinc-400 font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="font-mono text-zinc-400 block mb-1">Email:</label>
+              <input
+                type="email"
+                value={email}
+                readOnly
+                className="w-full p-2.5 rounded bg-black/40 border border-zinc-800 text-zinc-400 font-mono"
               />
             </div>
 
@@ -77,6 +161,8 @@ export function SettingsView() {
               <label className="font-mono text-zinc-400 block mb-1">Target Role Headline:</label>
               <input
                 type="text"
+                value={headline}
+                onChange={(e) => setHeadline(e.target.value)}
                 placeholder="Target role or headline"
                 className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none placeholder-zinc-600"
               />
@@ -86,17 +172,26 @@ export function SettingsView() {
               <label className="font-mono text-zinc-400 block mb-1">Technical Bio:</label>
               <textarea
                 rows={3}
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
                 placeholder="Short technical bio for your public profile"
                 className="w-full p-2.5 rounded bg-black/50 border border-[#22c55e]/30 text-slate-200 font-mono focus:outline-none placeholder-zinc-600"
               />
             </div>
 
-            <div className="pt-2">
-              <button className="px-4 py-2 rounded bg-[#22c55e] text-black font-bold hover:bg-emerald-400 transition">
-                Save Profile Changes
+            <div className="pt-2 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleSaveProfile}
+                disabled={saving}
+                className="px-4 py-2 rounded bg-[#22c55e] text-black font-bold hover:bg-emerald-400 transition disabled:opacity-60"
+              >
+                {saving ? 'Saving…' : 'Save Profile Changes'}
               </button>
+              {saveMessage && <span className="text-[11px] font-mono text-zinc-400">{saveMessage}</span>}
             </div>
           </div>
+          )}
         </div>
       )}
 
@@ -135,25 +230,37 @@ export function SettingsView() {
 
       {/* TAB 3: Integrations */}
       {activeTab === 'integrations' && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          {[
-            { name: 'Google Gemini API', desc: '@google/genai SDK on server side', status: 'Connected', key: 'GEMINI_API_KEY' },
-            { name: 'Cloudinary CDN', desc: 'Media uploads & automatic WEBP transforms', status: 'Connected', key: 'CLOUDINARY_URL' },
-            { name: 'LinkedIn Professional API', desc: 'OAuth token for post publishing and analytics', status: 'Connected', key: 'LINKEDIN_OAUTH' },
-          ].map((integ, i) => (
-            <div key={i} className="p-4 rounded-xl bg-[#0e1710] border border-[#22c55e]/20 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-100">{integ.name}</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
-                  {integ.status}
-                </span>
+        <div className="space-y-4 max-w-2xl text-xs">
+          <p className="text-zinc-400">
+            Connect a social account to publish from SignalForge. Nothing is connected until you complete OAuth.
+          </p>
+          {connectNotice && (
+            <p className="text-[11px] font-mono text-amber-300/90">{connectNotice}</p>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {socialAccounts.map((account) => (
+              <div key={account.id} className="p-4 rounded-xl bg-[#0e1710] border border-[#22c55e]/20 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-bold text-slate-100">{account.name}</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-700">
+                    Not connected
+                  </span>
+                </div>
+                <p className="text-zinc-400">{account.desc}</p>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setConnectNotice(
+                      `${account.name} OAuth is not configured yet. Add the provider credentials, then connect from here.`
+                    )
+                  }
+                  className="px-3 py-1.5 rounded bg-[#22c55e]/15 border border-[#22c55e]/40 text-emerald-300 font-semibold hover:bg-[#22c55e]/25"
+                >
+                  Connect {account.name}
+                </button>
               </div>
-              <p className="text-zinc-400">{integ.desc}</p>
-              <div className="text-[10px] font-mono text-zinc-500 pt-1">
-                Ref: <code className="text-emerald-400">{integ.key}</code>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 

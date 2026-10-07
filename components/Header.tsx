@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Terminal,
   Zap,
@@ -35,7 +36,39 @@ export function Header({
   onOpenAiAssistant,
   unreadNotificationsCount,
 }: HeaderProps) {
+  const router = useRouter();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [account, setAccount] = useState<{ name: string; email: string; username: string } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/v1/auth/session')
+      .then((res) => res.json())
+      .then((data) => {
+        const user = data?.data?.user;
+        if (!cancelled && user?.email) {
+          setAccount({ name: user.name, email: user.email, username: user.username });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const initials = account?.name
+    ? account.name
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() || '')
+        .join('')
+    : '—';
+
+  const handleLogout = async () => {
+    await fetch('/api/v1/auth/logout', { method: 'POST' });
+    setProfileDropdownOpen(false);
+    router.push('/login');
+  };
 
   const getModuleTitle = (mod: string) => {
     switch (mod) {
@@ -145,17 +178,22 @@ export function Header({
             className="flex items-center gap-2 p-1 pl-2 rounded-lg bg-[#0e1710] border border-[#22c55e]/20 hover:border-[#22c55e]/40 transition text-xs"
           >
             <div className="w-5 h-5 rounded bg-emerald-900/80 border border-emerald-500/40 flex items-center justify-center text-[10px] font-bold text-emerald-300">
-              AG
+              {initials}
             </div>
-            <span className="font-semibold text-zinc-200 hidden lg:inline">Account</span>
+            <span className="font-semibold text-zinc-200 hidden lg:inline max-w-[120px] truncate">
+              {account?.name || 'Account'}
+            </span>
             <ChevronDown className="w-3 h-3 text-zinc-400" />
           </button>
 
           {profileDropdownOpen && (
             <div className="absolute right-0 mt-2 w-56 rounded-lg bg-[#0e1710] border border-[#22c55e]/30 shadow-xl py-1 text-xs z-50 animate-in fade-in zoom-in-95">
               <div className="px-3 py-2 border-b border-[#22c55e]/15">
-                <div className="font-bold text-emerald-300">Your profile</div>
-                <div className="text-[11px] text-zinc-400 truncate">Sign in to see account details</div>
+                <div className="font-bold text-emerald-300 truncate">{account?.name || 'Signed in'}</div>
+                <div className="text-[11px] text-zinc-400 truncate">{account?.email || ''}</div>
+                {account?.username ? (
+                  <div className="text-[10px] text-zinc-500 font-mono mt-1">@{account.username}</div>
+                ) : null}
               </div>
 
               <div className="py-1">
@@ -177,8 +215,14 @@ export function Header({
                 </Link>
               </div>
 
-              <div className="border-t border-[#22c55e]/15 px-3 py-1.5 text-[11px] text-zinc-500 font-mono">
-                Theme: Cyber / Developer
+              <div className="border-t border-[#22c55e]/15 py-1">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full text-left px-3 py-1.5 text-zinc-400 hover:text-red-300 hover:bg-red-950/30"
+                >
+                  Sign out
+                </button>
               </div>
             </div>
           )}
