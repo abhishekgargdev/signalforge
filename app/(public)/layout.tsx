@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { Zap, Terminal, Github, Linkedin, ArrowRight } from 'lucide-react';
+import { Terminal, Github, Linkedin, ArrowRight } from 'lucide-react';
+import { BrandMark } from '@/components/BrandMark';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const currentYear = new Date().getFullYear();
@@ -11,9 +12,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <header className="border-b border-[#22c55e]/20 bg-[#080c08]/90 backdrop-blur-md sticky top-0 z-40 px-4 sm:px-8 py-3.5">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-[#22c55e] text-black font-extrabold flex items-center justify-center shadow-md shadow-[#22c55e]/30 group-hover:scale-105 transition-transform">
-              <Zap className="w-4 h-4 stroke-[3]" />
-            </div>
+            <BrandMark size={32} className="rounded-lg shadow-md shadow-[#22c55e]/30 group-hover:scale-105 transition-transform" />
             <div>
               <span className="font-extrabold text-sm tracking-wider text-emerald-400">
                 SIGNALFORGE

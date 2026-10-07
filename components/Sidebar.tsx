@@ -17,9 +17,9 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Zap,
   UserPlus
 } from 'lucide-react';
+import { BrandMark } from '@/components/BrandMark';
 
 interface SidebarProps {
   currentModule: string;
@@ -60,9 +60,7 @@ export function Sidebar({
       <div>
         <div className="h-14 border-b border-[#22c55e]/20 px-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="w-8 h-8 rounded-lg bg-[#22c55e] text-black font-bold flex items-center justify-center flex-shrink-0 shadow-sm shadow-[#22c55e]/40">
-              <Zap className="w-4 h-4 stroke-[2.5]" />
-            </div>
+            <BrandMark size={32} className="rounded-lg flex-shrink-0 shadow-sm shadow-[#22c55e]/40" />
             {!collapsed && (
               <div className="overflow-hidden">
                 <span className="font-extrabold text-sm tracking-wider text-emerald-400 block truncate">

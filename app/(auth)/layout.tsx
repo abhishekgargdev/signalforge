@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Zap } from 'lucide-react';
+import { BrandMark } from '@/components/BrandMark';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,9 +8,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
           <Link href="/" className="inline-flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-[#22c55e] text-black font-extrabold flex items-center justify-center shadow-lg shadow-[#22c55e]/30">
-              <Zap className="w-5 h-5 stroke-[3]" />
-            </div>
+            <BrandMark size={40} className="rounded-xl shadow-lg shadow-[#22c55e]/30" />
           </Link>
           <div className="font-extrabold text-lg tracking-wider text-emerald-400">
             SIGNALFORGE
